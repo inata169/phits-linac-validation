@@ -86,7 +86,7 @@ def parse_phits_profile(file_path):
     try:
         with open(file_path, 'r', encoding='utf-8') as f:
             lines = f.readlines()
-        last_tally_start_index = next((i for i in range(len(lines) - 1, -1, -1) if '[ T-Deposit ]' in lines[i]), -1)
+        last_tally_start_index = next((i for i in range(len(lines) - 1, -1, -1) if '[t-deposit]' in lines[i].replace(' ', '').lower()), -1)
         if last_tally_start_index == -1: return None, None
         nx, ny, nz = 1, 1, 1
         for line in lines[last_tally_start_index:]:
@@ -109,14 +109,14 @@ def parse_phits_profile(file_path):
                 is_axis_present = profile_axis in header_words or f'{profile_axis}-lower' in header_words
                 is_dose_present = 'total' in header_words or 'all' in header_words
                 if is_axis_present and is_dose_present:
-                    line2 = lines[i+1].strip()
-                    if line2 and not line2.startswith('#'):
-                        header_line_index, data_start_index = i, i + 1
-                        header_columns = header_words
-                        break
-                    elif line2 == '#' and (i + 2 < len(lines)) and lines[i+2].strip() and not lines[i+2].strip().startswith('#'):
-                        header_line_index, data_start_index = i, i + 2
-                        header_columns = header_words
+                    for j in range(i + 1, len(lines)):
+                        data_line_candidate = lines[j].strip()
+                        if data_line_candidate and not data_line_candidate.startswith('#'):
+                            header_line_index = i
+                            data_start_index = j
+                            header_columns = header_words
+                            break
+                    if header_line_index != -1:
                         break
         if header_line_index == -1: return None, None
         num_columns = len(header_columns)
@@ -303,7 +303,7 @@ def main():
         sys.exit(1)
 
     if phits_axis and measured_axis:
-        is_match = (phits_axis == measured_axis == 'x') or \
+        is_match = (phits_axis == measured_axis) or \
                    (phits_axis == 'z' and measured_axis == 'y') or \
                    (phits_axis == 'y' and measured_axis == 'z')
         if not is_match:
