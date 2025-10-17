@@ -3,7 +3,7 @@
 ## 次回の開始プロンプト（そのまま使用可）
 あれ、直っていないね。たとえば、
 `C:\Users\放射治療研究用PC\Documents\Python\phits-linac-validation\output\Rev50-30x30--c8-0.49n\reports\TrueReport_30x30m20cm-zYlng_vs_deposit-y-water-200z_norm-dmax_zref-10_z-20-10.txt`
-の「## 解析パラメータ norm-mode: dmax, z_ref: 10.0 cm ref depth (cm): 20.000000, eval depth (cm): 10.000000 S_axis(ref): 0.434240, S_axis(eval): 0.649465」」」というように、ref depth (cm)とeval depth (cm)が合っていない。あなたは「深さ(cm)」の情報を読み取れないのではないですか？深さの情報は、測定値であれば「05x05m20cm-zYlng.csv」の”05x05”は照射野、"m"は測定値、"20cm"は深さ、”zYlng”はPHITSと測定器の軸で表されています。PHITSのアウトプットファイル「deposit-y-water-200x.out」では、”deposit”はdoseデータを入力していることを表している、”y-water-200x”は深さy=20cmで軸方向に測定していったデータである、ということを表しています。理解できましたか？
+の「## 解析パラメータ norm-mode: dmax, z_ref: 10.0 cm ref depth (cm): 20.000000, eval depth (cm): 10.000000 S_axis(ref): 0.434240, S_axis(eval): 0.649465」」」というように、ref depth (cm)とeval depth (cm)が合っていない。あなたは「深さ(cm)」の情報を読み取れないのではないですか？深さの情報は、測定値であれば「05x05m20cm-zYlng.csv」の”05x05”は照射野、"m"は測定値、"20cm"は深さ、”zYlng”は測定器の軸方向のデータである、と表されています。PHITSのアウトプットファイル「deposit-y-water-200x.out」では、”deposit”はPHITSのdoseデータを入力していることを表している、”y-water-200x”は深さy=20cmでx軸方向に測定していったデータである、ということを表しています。理解できましたか？
 
 ## 背景と問題点
 - レポート上の `ref depth (cm)` と `eval depth (cm)` が一致しないケースがある。
