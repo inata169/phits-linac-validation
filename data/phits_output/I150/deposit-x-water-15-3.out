@@ -1,0 +1,2060 @@
+[ T - Deposit ]
+    title = [t-deposit: icntl=0]
+     mesh =  xyz            # mesh type is xyz scoring mesh
+   x-type =    2            # x-mesh is linear given by xmin, xmax and nx
+     xmin =  -5.000000      # minimum value of x-mesh points
+     xmax =   5.000000      # maximum value of x-mesh points
+#    xdel =   10.00000      # mesh width of x-mesh points
+       nx =      1          # number of x-mesh points
+#    data = ( x(i), i = 1, nx + 1 )
+#          -5.00000E+00  5.00000E+00
+   y-type =    2            # y-mesh is linear given by ymin, ymax and ny
+     ymin =   1.350000      # minimum value of y-mesh points
+     ymax =   1.650000      # maximum value of y-mesh points
+#    ydel =  0.3000000      # mesh width of y-mesh points
+       ny =      1          # number of y-mesh points
+#    data = ( y(i), i = 1, ny + 1 )
+#           1.35000E+00  1.65000E+00
+   z-type =    2            # z-mesh is linear given by zmin, zmax and nz
+     zmin = -0.2500000      # minimum value of z-mesh points
+     zmax =  0.2500000      # maximum value of z-mesh points
+#    zdel =  6.2500000E-03  # mesh width of z-mesh points
+       nz =     80          # number of z-mesh points
+#    data = ( z(i), i = 1, nz + 1 )
+#          -2.50000E-01 -2.43750E-01 -2.37500E-01 -2.31250E-01 -2.25000E-01
+#          -2.18750E-01 -2.12500E-01 -2.06250E-01 -2.00000E-01 -1.93750E-01
+#          -1.87500E-01 -1.81250E-01 -1.75000E-01 -1.68750E-01 -1.62500E-01
+#          -1.56250E-01 -1.50000E-01 -1.43750E-01 -1.37500E-01 -1.31250E-01
+#          -1.25000E-01 -1.18750E-01 -1.12500E-01 -1.06250E-01 -1.00000E-01
+#          -9.37500E-02 -8.75000E-02 -8.12500E-02 -7.50000E-02 -6.87500E-02
+#          -6.25000E-02 -5.62500E-02 -5.00000E-02 -4.37500E-02 -3.75000E-02
+#          -3.12500E-02 -2.50000E-02 -1.87500E-02 -1.25000E-02 -6.25000E-03
+#           0.00000E+00  6.25000E-03  1.25000E-02  1.87500E-02  2.50000E-02
+#           3.12500E-02  3.75000E-02  4.37500E-02  5.00000E-02  5.62500E-02
+#           6.25000E-02  6.87500E-02  7.50000E-02  8.12500E-02  8.75000E-02
+#           9.37500E-02  1.00000E-01  1.06250E-01  1.12500E-01  1.18750E-01
+#           1.25000E-01  1.31250E-01  1.37500E-01  1.43750E-01  1.50000E-01
+#           1.56250E-01  1.62500E-01  1.68750E-01  1.75000E-01  1.81250E-01
+#           1.87500E-01  1.93750E-01  2.00000E-01  2.06250E-01  2.12500E-01
+#           2.18750E-01  2.25000E-01  2.31250E-01  2.37500E-01  2.43750E-01
+#           2.50000E-01
+     unit =    0            # unit is [Gy/source]
+   letmat =    0            # (D=0) mat ID for LET, 0:real mat, <0: electron for H2O
+  dedxfnc =    0            # (D=0) user defined multiplier, 0(no), 1, 2
+ material =  all            # (D=all) number of specific material
+   output =  dose           # total deposit energy
+  deposit =    0            # (D=0) 0-> total deposit dist, 1-> each process
+     axis =     x           # axis of output
+     file = deposit-x-water-15.out  # file name of output for the above axis
+     part =  all      
+# kf/name :  0        
+#    used :        main (  %)        temp (  %)       total (  %)
+#  memory :          88 (  0)           0 (  0)          88 (  0)
+
+#------------------------------------------------------------------------------
+#newpage:
+#   no. =  1   iy  =  1   iz  =  1
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -2.5000E-01  -  -2.4375E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2923E-13  0.0029
+
+'no. =  1,  iy =  1,  iz =  1'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -2.5000E-01 [cm]
+  zmax  &=&  -2.4375E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. =  2   iy  =  1   iz  =  2
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -2.4375E-01  -  -2.3750E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2805E-13  0.0028
+
+'no. =  2,  iy =  1,  iz =  2'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -2.4375E-01 [cm]
+  zmax  &=&  -2.3750E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. =  3   iy  =  1   iz  =  3
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -2.3750E-01  -  -2.3125E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2951E-13  0.0028
+
+'no. =  3,  iy =  1,  iz =  3'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -2.3750E-01 [cm]
+  zmax  &=&  -2.3125E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. =  4   iy  =  1   iz  =  4
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -2.3125E-01  -  -2.2500E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2904E-13  0.0033
+
+'no. =  4,  iy =  1,  iz =  4'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -2.3125E-01 [cm]
+  zmax  &=&  -2.2500E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. =  5   iy  =  1   iz  =  5
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -2.2500E-01  -  -2.1875E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2883E-13  0.0031
+
+'no. =  5,  iy =  1,  iz =  5'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -2.2500E-01 [cm]
+  zmax  &=&  -2.1875E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. =  6   iy  =  1   iz  =  6
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -2.1875E-01  -  -2.1250E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2954E-13  0.0037
+
+'no. =  6,  iy =  1,  iz =  6'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -2.1875E-01 [cm]
+  zmax  &=&  -2.1250E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. =  7   iy  =  1   iz  =  7
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -2.1250E-01  -  -2.0625E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3044E-13  0.0027
+
+'no. =  7,  iy =  1,  iz =  7'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -2.1250E-01 [cm]
+  zmax  &=&  -2.0625E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. =  8   iy  =  1   iz  =  8
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -2.0625E-01  -  -2.0000E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3018E-13  0.0039
+
+'no. =  8,  iy =  1,  iz =  8'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -2.0625E-01 [cm]
+  zmax  &=&  -2.0000E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. =  9   iy  =  1   iz  =  9
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -2.0000E-01  -  -1.9375E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3069E-13  0.0030
+
+'no. =  9,  iy =  1,  iz =  9'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -2.0000E-01 [cm]
+  zmax  &=&  -1.9375E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 10   iy  =  1   iz  = 10
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.9375E-01  -  -1.8750E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3231E-13  0.0036
+
+'no. = 10,  iy =  1,  iz = 10'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.9375E-01 [cm]
+  zmax  &=&  -1.8750E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 11   iy  =  1   iz  = 11
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.8750E-01  -  -1.8125E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3155E-13  0.0033
+
+'no. = 11,  iy =  1,  iz = 11'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.8750E-01 [cm]
+  zmax  &=&  -1.8125E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 12   iy  =  1   iz  = 12
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.8125E-01  -  -1.7500E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3205E-13  0.0026
+
+'no. = 12,  iy =  1,  iz = 12'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.8125E-01 [cm]
+  zmax  &=&  -1.7500E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 13   iy  =  1   iz  = 13
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.7500E-01  -  -1.6875E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3333E-13  0.0026
+
+'no. = 13,  iy =  1,  iz = 13'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.7500E-01 [cm]
+  zmax  &=&  -1.6875E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 14   iy  =  1   iz  = 14
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.6875E-01  -  -1.6250E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3381E-13  0.0025
+
+'no. = 14,  iy =  1,  iz = 14'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.6875E-01 [cm]
+  zmax  &=&  -1.6250E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 15   iy  =  1   iz  = 15
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.6250E-01  -  -1.5625E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3251E-13  0.0024
+
+'no. = 15,  iy =  1,  iz = 15'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.6250E-01 [cm]
+  zmax  &=&  -1.5625E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 16   iy  =  1   iz  = 16
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.5625E-01  -  -1.5000E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3351E-13  0.0024
+
+'no. = 16,  iy =  1,  iz = 16'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.5625E-01 [cm]
+  zmax  &=&  -1.5000E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 17   iy  =  1   iz  = 17
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.5000E-01  -  -1.4375E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3348E-13  0.0029
+
+'no. = 17,  iy =  1,  iz = 17'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.5000E-01 [cm]
+  zmax  &=&  -1.4375E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 18   iy  =  1   iz  = 18
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.4375E-01  -  -1.3750E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3584E-13  0.0027
+
+'no. = 18,  iy =  1,  iz = 18'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.4375E-01 [cm]
+  zmax  &=&  -1.3750E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 19   iy  =  1   iz  = 19
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.3750E-01  -  -1.3125E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3514E-13  0.0031
+
+'no. = 19,  iy =  1,  iz = 19'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.3750E-01 [cm]
+  zmax  &=&  -1.3125E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 20   iy  =  1   iz  = 20
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.3125E-01  -  -1.2500E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3549E-13  0.0028
+
+'no. = 20,  iy =  1,  iz = 20'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.3125E-01 [cm]
+  zmax  &=&  -1.2500E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 21   iy  =  1   iz  = 21
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.2500E-01  -  -1.1875E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3717E-13  0.0036
+
+'no. = 21,  iy =  1,  iz = 21'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.2500E-01 [cm]
+  zmax  &=&  -1.1875E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 22   iy  =  1   iz  = 22
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.1875E-01  -  -1.1250E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3582E-13  0.0024
+
+'no. = 22,  iy =  1,  iz = 22'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.1875E-01 [cm]
+  zmax  &=&  -1.1250E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 23   iy  =  1   iz  = 23
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.1250E-01  -  -1.0625E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3479E-13  0.0027
+
+'no. = 23,  iy =  1,  iz = 23'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.1250E-01 [cm]
+  zmax  &=&  -1.0625E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 24   iy  =  1   iz  = 24
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.0625E-01  -  -1.0000E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3463E-13  0.0037
+
+'no. = 24,  iy =  1,  iz = 24'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.0625E-01 [cm]
+  zmax  &=&  -1.0000E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 25   iy  =  1   iz  = 25
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.0000E-01  -  -9.3750E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3522E-13  0.0034
+
+'no. = 25,  iy =  1,  iz = 25'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.0000E-01 [cm]
+  zmax  &=&  -9.3750E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 26   iy  =  1   iz  = 26
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -9.3750E-02  -  -8.7500E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3524E-13  0.0033
+
+'no. = 26,  iy =  1,  iz = 26'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -9.3750E-02 [cm]
+  zmax  &=&  -8.7500E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 27   iy  =  1   iz  = 27
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -8.7500E-02  -  -8.1250E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3605E-13  0.0032
+
+'no. = 27,  iy =  1,  iz = 27'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -8.7500E-02 [cm]
+  zmax  &=&  -8.1250E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 28   iy  =  1   iz  = 28
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -8.1250E-02  -  -7.5000E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3759E-13  0.0037
+
+'no. = 28,  iy =  1,  iz = 28'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -8.1250E-02 [cm]
+  zmax  &=&  -7.5000E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 29   iy  =  1   iz  = 29
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -7.5000E-02  -  -6.8750E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3727E-13  0.0029
+
+'no. = 29,  iy =  1,  iz = 29'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -7.5000E-02 [cm]
+  zmax  &=&  -6.8750E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 30   iy  =  1   iz  = 30
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -6.8750E-02  -  -6.2500E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3615E-13  0.0030
+
+'no. = 30,  iy =  1,  iz = 30'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -6.8750E-02 [cm]
+  zmax  &=&  -6.2500E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 31   iy  =  1   iz  = 31
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -6.2500E-02  -  -5.6250E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3554E-13  0.0026
+
+'no. = 31,  iy =  1,  iz = 31'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -6.2500E-02 [cm]
+  zmax  &=&  -5.6250E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 32   iy  =  1   iz  = 32
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -5.6250E-02  -  -5.0000E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3626E-13  0.0029
+
+'no. = 32,  iy =  1,  iz = 32'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -5.6250E-02 [cm]
+  zmax  &=&  -5.0000E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 33   iy  =  1   iz  = 33
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -5.0000E-02  -  -4.3750E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3764E-13  0.0028
+
+'no. = 33,  iy =  1,  iz = 33'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -5.0000E-02 [cm]
+  zmax  &=&  -4.3750E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 34   iy  =  1   iz  = 34
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -4.3750E-02  -  -3.7500E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3815E-13  0.0025
+
+'no. = 34,  iy =  1,  iz = 34'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -4.3750E-02 [cm]
+  zmax  &=&  -3.7500E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 35   iy  =  1   iz  = 35
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -3.7500E-02  -  -3.1250E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3720E-13  0.0029
+
+'no. = 35,  iy =  1,  iz = 35'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -3.7500E-02 [cm]
+  zmax  &=&  -3.1250E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 36   iy  =  1   iz  = 36
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -3.1250E-02  -  -2.5000E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3654E-13  0.0033
+
+'no. = 36,  iy =  1,  iz = 36'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -3.1250E-02 [cm]
+  zmax  &=&  -2.5000E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 37   iy  =  1   iz  = 37
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -2.5000E-02  -  -1.8750E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3729E-13  0.0024
+
+'no. = 37,  iy =  1,  iz = 37'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -2.5000E-02 [cm]
+  zmax  &=&  -1.8750E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 38   iy  =  1   iz  = 38
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.8750E-02  -  -1.2500E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3626E-13  0.0030
+
+'no. = 38,  iy =  1,  iz = 38'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.8750E-02 [cm]
+  zmax  &=&  -1.2500E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 39   iy  =  1   iz  = 39
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -1.2500E-02  -  -6.2500E-03  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3817E-13  0.0031
+
+'no. = 39,  iy =  1,  iz = 39'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -1.2500E-02 [cm]
+  zmax  &=&  -6.2500E-03 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 40   iy  =  1   iz  = 40
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (  -6.2500E-03  -   0.0000E+00  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3720E-13  0.0025
+
+'no. = 40,  iy =  1,  iz = 40'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&  -6.2500E-03 [cm]
+  zmax  &=&   0.0000E+00 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 41   iy  =  1   iz  = 41
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   0.0000E+00  -   6.2500E-03  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3615E-13  0.0031
+
+'no. = 41,  iy =  1,  iz = 41'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   0.0000E+00 [cm]
+  zmax  &=&   6.2500E-03 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 42   iy  =  1   iz  = 42
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   6.2500E-03  -   1.2500E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3836E-13  0.0033
+
+'no. = 42,  iy =  1,  iz = 42'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   6.2500E-03 [cm]
+  zmax  &=&   1.2500E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 43   iy  =  1   iz  = 43
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.2500E-02  -   1.8750E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3779E-13  0.0029
+
+'no. = 43,  iy =  1,  iz = 43'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.2500E-02 [cm]
+  zmax  &=&   1.8750E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 44   iy  =  1   iz  = 44
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.8750E-02  -   2.5000E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3644E-13  0.0033
+
+'no. = 44,  iy =  1,  iz = 44'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.8750E-02 [cm]
+  zmax  &=&   2.5000E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 45   iy  =  1   iz  = 45
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   2.5000E-02  -   3.1250E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3710E-13  0.0029
+
+'no. = 45,  iy =  1,  iz = 45'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   2.5000E-02 [cm]
+  zmax  &=&   3.1250E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 46   iy  =  1   iz  = 46
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   3.1250E-02  -   3.7500E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3817E-13  0.0033
+
+'no. = 46,  iy =  1,  iz = 46'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   3.1250E-02 [cm]
+  zmax  &=&   3.7500E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 47   iy  =  1   iz  = 47
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   3.7500E-02  -   4.3750E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3710E-13  0.0028
+
+'no. = 47,  iy =  1,  iz = 47'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   3.7500E-02 [cm]
+  zmax  &=&   4.3750E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 48   iy  =  1   iz  = 48
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   4.3750E-02  -   5.0000E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3750E-13  0.0030
+
+'no. = 48,  iy =  1,  iz = 48'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   4.3750E-02 [cm]
+  zmax  &=&   5.0000E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 49   iy  =  1   iz  = 49
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   5.0000E-02  -   5.6250E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3730E-13  0.0032
+
+'no. = 49,  iy =  1,  iz = 49'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   5.0000E-02 [cm]
+  zmax  &=&   5.6250E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 50   iy  =  1   iz  = 50
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   5.6250E-02  -   6.2500E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3779E-13  0.0035
+
+'no. = 50,  iy =  1,  iz = 50'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   5.6250E-02 [cm]
+  zmax  &=&   6.2500E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 51   iy  =  1   iz  = 51
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   6.2500E-02  -   6.8750E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3671E-13  0.0019
+
+'no. = 51,  iy =  1,  iz = 51'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   6.2500E-02 [cm]
+  zmax  &=&   6.8750E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 52   iy  =  1   iz  = 52
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   6.8750E-02  -   7.5000E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3611E-13  0.0023
+
+'no. = 52,  iy =  1,  iz = 52'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   6.8750E-02 [cm]
+  zmax  &=&   7.5000E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 53   iy  =  1   iz  = 53
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   7.5000E-02  -   8.1250E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3578E-13  0.0022
+
+'no. = 53,  iy =  1,  iz = 53'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   7.5000E-02 [cm]
+  zmax  &=&   8.1250E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 54   iy  =  1   iz  = 54
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   8.1250E-02  -   8.7500E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3465E-13  0.0022
+
+'no. = 54,  iy =  1,  iz = 54'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   8.1250E-02 [cm]
+  zmax  &=&   8.7500E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 55   iy  =  1   iz  = 55
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   8.7500E-02  -   9.3750E-02  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3501E-13  0.0035
+
+'no. = 55,  iy =  1,  iz = 55'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   8.7500E-02 [cm]
+  zmax  &=&   9.3750E-02 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 56   iy  =  1   iz  = 56
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   9.3750E-02  -   1.0000E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3415E-13  0.0030
+
+'no. = 56,  iy =  1,  iz = 56'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   9.3750E-02 [cm]
+  zmax  &=&   1.0000E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 57   iy  =  1   iz  = 57
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.0000E-01  -   1.0625E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3457E-13  0.0031
+
+'no. = 57,  iy =  1,  iz = 57'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.0000E-01 [cm]
+  zmax  &=&   1.0625E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 58   iy  =  1   iz  = 58
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.0625E-01  -   1.1250E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3516E-13  0.0027
+
+'no. = 58,  iy =  1,  iz = 58'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.0625E-01 [cm]
+  zmax  &=&   1.1250E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 59   iy  =  1   iz  = 59
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.1250E-01  -   1.1875E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3545E-13  0.0030
+
+'no. = 59,  iy =  1,  iz = 59'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.1250E-01 [cm]
+  zmax  &=&   1.1875E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 60   iy  =  1   iz  = 60
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.1875E-01  -   1.2500E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3582E-13  0.0029
+
+'no. = 60,  iy =  1,  iz = 60'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.1875E-01 [cm]
+  zmax  &=&   1.2500E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 61   iy  =  1   iz  = 61
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.2500E-01  -   1.3125E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3506E-13  0.0027
+
+'no. = 61,  iy =  1,  iz = 61'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.2500E-01 [cm]
+  zmax  &=&   1.3125E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 62   iy  =  1   iz  = 62
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.3125E-01  -   1.3750E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3438E-13  0.0029
+
+'no. = 62,  iy =  1,  iz = 62'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.3125E-01 [cm]
+  zmax  &=&   1.3750E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 63   iy  =  1   iz  = 63
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.3750E-01  -   1.4375E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3347E-13  0.0034
+
+'no. = 63,  iy =  1,  iz = 63'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.3750E-01 [cm]
+  zmax  &=&   1.4375E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 64   iy  =  1   iz  = 64
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.4375E-01  -   1.5000E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3441E-13  0.0025
+
+'no. = 64,  iy =  1,  iz = 64'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.4375E-01 [cm]
+  zmax  &=&   1.5000E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 65   iy  =  1   iz  = 65
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.5000E-01  -   1.5625E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3384E-13  0.0021
+
+'no. = 65,  iy =  1,  iz = 65'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.5000E-01 [cm]
+  zmax  &=&   1.5625E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 66   iy  =  1   iz  = 66
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.5625E-01  -   1.6250E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3397E-13  0.0026
+
+'no. = 66,  iy =  1,  iz = 66'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.5625E-01 [cm]
+  zmax  &=&   1.6250E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 67   iy  =  1   iz  = 67
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.6250E-01  -   1.6875E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3392E-13  0.0026
+
+'no. = 67,  iy =  1,  iz = 67'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.6250E-01 [cm]
+  zmax  &=&   1.6875E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 68   iy  =  1   iz  = 68
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.6875E-01  -   1.7500E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3353E-13  0.0022
+
+'no. = 68,  iy =  1,  iz = 68'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.6875E-01 [cm]
+  zmax  &=&   1.7500E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 69   iy  =  1   iz  = 69
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.7500E-01  -   1.8125E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3251E-13  0.0025
+
+'no. = 69,  iy =  1,  iz = 69'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.7500E-01 [cm]
+  zmax  &=&   1.8125E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 70   iy  =  1   iz  = 70
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.8125E-01  -   1.8750E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3249E-13  0.0027
+
+'no. = 70,  iy =  1,  iz = 70'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.8125E-01 [cm]
+  zmax  &=&   1.8750E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 71   iy  =  1   iz  = 71
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.8750E-01  -   1.9375E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3175E-13  0.0027
+
+'no. = 71,  iy =  1,  iz = 71'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.8750E-01 [cm]
+  zmax  &=&   1.9375E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 72   iy  =  1   iz  = 72
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   1.9375E-01  -   2.0000E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.3069E-13  0.0023
+
+'no. = 72,  iy =  1,  iz = 72'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   1.9375E-01 [cm]
+  zmax  &=&   2.0000E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 73   iy  =  1   iz  = 73
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   2.0000E-01  -   2.0625E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2994E-13  0.0027
+
+'no. = 73,  iy =  1,  iz = 73'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   2.0000E-01 [cm]
+  zmax  &=&   2.0625E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 74   iy  =  1   iz  = 74
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   2.0625E-01  -   2.1250E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2864E-13  0.0029
+
+'no. = 74,  iy =  1,  iz = 74'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   2.0625E-01 [cm]
+  zmax  &=&   2.1250E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 75   iy  =  1   iz  = 75
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   2.1250E-01  -   2.1875E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2713E-13  0.0033
+
+'no. = 75,  iy =  1,  iz = 75'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   2.1250E-01 [cm]
+  zmax  &=&   2.1875E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 76   iy  =  1   iz  = 76
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   2.1875E-01  -   2.2500E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2836E-13  0.0026
+
+'no. = 76,  iy =  1,  iz = 76'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   2.1875E-01 [cm]
+  zmax  &=&   2.2500E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 77   iy  =  1   iz  = 77
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   2.2500E-01  -   2.3125E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2839E-13  0.0025
+
+'no. = 77,  iy =  1,  iz = 77'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   2.2500E-01 [cm]
+  zmax  &=&   2.3125E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 78   iy  =  1   iz  = 78
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   2.3125E-01  -   2.3750E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2727E-13  0.0029
+
+'no. = 78,  iy =  1,  iz = 78'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   2.3125E-01 [cm]
+  zmax  &=&   2.3750E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 79   iy  =  1   iz  = 79
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   2.3750E-01  -   2.4375E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2833E-13  0.0028
+
+'no. = 79,  iy =  1,  iz = 79'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   2.3750E-01 [cm]
+  zmax  &=&   2.4375E-01 [cm]
+e:
+
+#------------------------------------------------------------------------------
+ newpage:
+#   no. = 80   iy  =  1   iz  = 80
+#   y = (   1.3500E+00  -   1.6500E+00  )
+#   z = (   2.4375E-01  -   2.5000E-01  )
+
+x: x [cm]
+y: Dose [Gy/source]      
+p: xlin ylog afac(0.8) form(0.9)
+h: n            x            y(all     ),hh0l   n 
+#  x-lower      x-upper      all         r.err 
+  -5.0000E+00   5.0000E+00   3.2669E-13  0.0026
+
+'no. = 80,  iy =  1,  iz = 80'
+msuc: {\huge [t-deposit: icntl=0]}
+msdr: {\it plotted by \ANGEL \version}
+msdl: {\it calculated by \PHITS  3.08}
+wt: s(0.7)
+\vspace{-3}
+  ymin  &=&   1.3500E+00 [cm]
+  ymax  &=&   1.6500E+00 [cm]
+  zmin  &=&   2.4375E-01 [cm]
+  zmax  &=&   2.5000E-01 [cm]
+e:
+ 
+# Information for Restart Calculation
+# This calculation was newly started
+# istdev =  1 # 1:Batch variance, 2:History variance
+# resc2  = 2.60000000000000000E+01 # Total source weight or Total source weight / maxcas
+# resc3  = 2.60000000000000000E+01 # Total history number or Total batch number
+# maxcas =    10000000 # History / Batch, only used for istdev=1
+# rijklst= 206420872329881.0 # Next initial random number

@@ -1,0 +1,75 @@
+﻿$ErrorActionPreference = 'Stop'
+
+function Set-Config($phitsDir, $outputDir) {
+  $cfg = @()
+  $cfg += '[Paths]'
+  $cfg += "phits_data_dir = $phitsDir"
+  $cfg += ''
+  $cfg += 'measured_data_dir = ' + (Resolve-Path '..\data\measured_csv').Path
+  $cfg += ''
+  $cfg += "output_dir = $outputDir"
+  $cfg += ''
+  $cfg += '[Processing]'
+  $cfg += 'resample_grid_cm = 0.1'
+  Set-Content -Encoding utf8 ..\config.ini $cfg
+}
+
+function Run-OneCase($revFolder, $sizePrefix, [int]$depth, [string]$axis) {
+  $repoRoot = (Resolve-Path '..').Path
+  $measRoot = (Resolve-Path '..\data\measured_csv').Path
+  $outRoot  = Join-Path $repoRoot ('output\' + ([IO.Path]::GetFileName($revFolder)))
+
+  New-Item -ItemType Directory -Force -Path (Join-Path $outRoot 'plots') | Out-Null
+  New-Item -ItemType Directory -Force -Path (Join-Path $outRoot 'reports') | Out-Null
+  New-Item -ItemType Directory -Force -Path (Join-Path $outRoot 'data') | Out-Null
+
+  Set-Config -phitsDir $revFolder -outputDir $outRoot
+
+  $pddCsv    = Join-Path $measRoot ("{0}PDD-zZver.csv" -f $sizePrefix)
+  $measDepth = if ($depth -lt 10) { ('0{0}' -f $depth) } else { ('{0}' -f $depth) }
+  $phitsTag  = switch ($depth) { 5 { '050' } 10 { '100' } 20 { '200' } default { ('{0:000}' -f $depth) } }
+  $measOcr   = if ($axis -eq 'x') { Join-Path $measRoot ("{0}{1}cm-xXlat.csv" -f $sizePrefix, $measDepth) } else { Join-Path $measRoot ("{0}{1}cm-zYlng.csv" -f $sizePrefix, $measDepth) }
+  $phitsOcr  = if ($axis -eq 'x') { Join-Path $revFolder ("deposit-y-water-{0}x.out" -f $phitsTag) } else { Join-Path $revFolder ("deposit-y-water-{0}z.out" -f $phitsTag) }
+
+  if (!(Test-Path $pddCsv))   { Write-Host "[SKIP] PDD missing: $pddCsv"; return }
+  if (!(Test-Path $measOcr))  { Write-Host "[SKIP] Measured OCR missing: $measOcr"; return }
+  if (!(Test-Path $phitsOcr)) { Write-Host "[SKIP] PHITS OCR missing: $phitsOcr"; return }
+
+  Write-Host ("RUN {0} d={1} ax={2}" -f $sizePrefix, $depth, $axis)
+
+  $py = Join-Path $repoRoot 'src\ocr_true_scaling.py'
+  $args = @(
+    $py,
+    '--ref-pdd-type','csv','--ref-pdd-file', $pddCsv,
+    '--eval-pdd-type','csv','--eval-pdd-file', $pddCsv,
+    '--ref-ocr-type','csv','--ref-ocr-file', $measOcr,
+    '--eval-ocr-type','phits','--eval-ocr-file', $phitsOcr,
+    '--norm-mode','dmax','--cutoff','10','--xlim-symmetric',
+    '--smooth-window','5','--smooth-order','2',
+    '--export-csv','--export-gamma'
+  )
+  python @args | ForEach-Object { $_ }
+}
+
+# Define PHITS folders and corresponding measurement size prefixes
+$scenarios = @(
+  @{ folder = 'C:\phits\work\Elekta\6MV\Rev60-5x5-c8-0.49n';  size = '05x05m' },
+  @{ folder = 'C:\phits\work\Elekta\6MV\Rev47-c8-0.49n';       size = '10x10m' },
+  @{ folder = 'C:\phits\work\Elekta\6MV\Rev50-30x30--c8-0.49n'; size = '30x30m' }
+)
+$depths = @(5,10,20)
+$axes   = @('x','z')
+
+foreach ($sc in $scenarios) {
+  foreach ($d in $depths) {
+    foreach ($ax in $axes) {
+      Run-OneCase $sc.folder $sc.size $d $ax
+    }
+  }
+}
+
+Write-Host "`nCompleted. Check outputs under repo-relative paths:"
+Write-Host "  output/Rev60-5x5-c8-0.49n/{plots,reports,data}"
+Write-Host "  output/Rev47-c8-0.49n/{plots,reports,data}"
+Write-Host "  output/Rev50-30x30--c8-0.49n/{plots,reports,data}"
+

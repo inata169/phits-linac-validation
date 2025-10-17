@@ -1,0 +1,323 @@
+ file = water.inp
+
+[ Title ]
+Beam setting 1
+
+[ Parameters ]
+   icntl  = 0
+   maxcas = 5000000
+   maxbch = 30
+$ Optimized for Photon Therapy
+ emin(2)  = 1.000000000E-10 # (D=1.0) cut-off energy of neutron (MeV)
+ dmax(2)  =  20.0000000     # (D=emin(2)) data max. energy of neutron (MeV)
+ emin(12) = 1.000000000E-01 # (D=1.d9) cut-off energy of electron (MeV)
+ emin(13) = 1.000000000E-01 # (D=1.d9) cut-off energy of positron (MeV)
+ emin(14) = 1.000000000E-03 # (D=1.d9) cut-off energy of photon (MeV)
+ dmax(12) =  1000.00000     # (D=emin(12)) data max. energy of electron (MeV)
+ dmax(13) =  1000.00000     # (D=emin(13)) data max. energy of positron (MeV)
+ dmax(14) =  1000.00000     # (D=emin(14)) data max. energy of photon (MeV)
+ igamma   =           2     # (D=0) 0:No, 1:Old, 2:EBITEM, 3:EBITEM+Isomer
+$ Optimized for Photon Therapy
+ ipnint   =           0     # (D=0) 0: no, 1: consider photo-nuclear reaction
+ negs     =           0     # (D=0) =1 EGS photon and electron
+ file(6)  = phits-water.out       # (D=phits.out) general output file name
+ file(7)  = c:/phits/data/xsdir.jnd # (D=c:/phits/data/xsdir.jnd) nuclear data input file name
+ file(20) = c:/phits/XS/egs # (D=c:/phits/XS/egs) EGS library data folder name
+$ Library data paths for file(7) & file(14)
+ infl:{ c:\phits\Work\Iris10\CK-Treatment\libpath.inp}
+
+set: c91[     0.0    ] $ isocenter x
+set: c92[     0.0    ] $ isocenter y
+set: c93[     0.0    ] $ isocenter z
+set: c94[    80.0    ] $ beam distance 
+set: c95[    10.0    ] $ irradiation field x length
+set: c96[    10.0    ] $ irradiation field z length
+
+[ S o u r c e ]
+set:c1[69184770]  $ ORIG_HISTORIES
+set:c2[9414373]   $ PARTICLES
+set:c3[0.01]   $ r0 Focus
+
+  totfact =  c2/c1          # (D=1.0) global factor
+   s-type =  4             # external source with PHITS dump file
+     e-type = 20
+     file =  cross_eng-Iris60.out
+     proj = photon
+     x0 =   0.0
+     y0 =  -80
+     z0 =   0.0 - c3
+     z1 =   0.0 + c3
+     dir =  0
+     phi =  90
+
+     r0 =  c3
+    dom =  1.75    # Iris 50 mm
+
+
+[ Surface ]
+$ Outer region
+   99 so 500
+$ Colimator inside
+$   90 rpp c91-0.1*c95 c91+0.1*c95 c92-0.9*c94 c92-0.8*c94 c93-0.1*c96 c93+0.1*c96
+$ Colimator outside
+$   91 rpp c91-0.5*c95 c91+0.5*c95 c92-0.9*c94 c92-0.8*c94 c93-0.5*c96 c93+0.5*c96
+$ Main Space
+   97 rpp -15.0 15.0 0 30.0 -15.0 15.0
+$ Detector
+$   10 cy 1
+$   11 py c92+10.0-0.05
+$   12 py c92+10.0+0.05
+
+[ Cell ]
+$ Main space
+$   90 -1             90 -91        $ Void colimator 
+   97  10 -1.0      -97             $ Water
+$   10  10 -1.0      -10  11 -12    $ Detector
+   98  1  -1.21e-3   97 -99         $ Air
+   99 -1         99                 $ Outer region
+
+[ Material ]
+ MAT[1] $ Air 1.21e-3 g/cm3
+           1H      7.199E-09
+          12C      7.585E-09
+          14N      3.910E-05
+          16O      1.054E-05
+ MAT[10] $ Water 1 g/cm3
+           1H      2
+          16O      1
+ 
+[ Volume ] off
+  reg   vol
+  10    pi*0.1
+
+[ T-deposit ]
+ title  = [t-deposit: icntl=0]
+ file   = deposit-z-water-15.out
+ mesh   = xyz
+ x-type = 2
+ nx     = 1
+ xmin   =-0.25
+ xmax   = 0.25
+ y-type = 2
+ ny     = 1
+ ymin   =  1.35
+ ymax   =  1.65
+ z-type = 2
+ nz     = 80
+ zmin   =-5.0
+ zmax   = 5.0
+ output = dose
+ unit   = 0
+ axis   = z
+ epsout = 0
+
+[ T-deposit ]
+ title  = [t-deposit: icntl=0]
+ file   = deposit-z-water-50.out
+ mesh   = xyz
+ x-type = 2
+ nx     = 1
+ xmin   =-0.25
+ xmax   = 0.25
+ y-type = 2
+ ny     = 1
+ ymin   = 4.85
+ ymax   = 5.15
+ z-type = 2
+ nz     = 80
+ zmin   =-5.0
+ zmax   = 5.0
+ output = dose
+ unit   = 0
+ axis   = z
+ epsout = 0
+
+[ T-deposit ]
+ title  = [t-deposit: icntl=0]
+ file   = deposit-z-water-100.out
+ mesh   = xyz
+ x-type = 2
+ nx     = 1
+ xmin   =-0.25
+ xmax   = 0.25
+ y-type = 2
+ ny     = 1
+ ymin   =  9.85
+ ymax   = 10.15
+ z-type = 2
+ nz     = 80
+ zmin   =-5.0
+ zmax   = 5.0
+ output = dose
+ unit   = 0
+ axis   = z
+ epsout = 0
+
+[ T-deposit ]
+ title  = [t-deposit: icntl=0]
+ file   = deposit-z-water-200.out
+ mesh   = xyz
+ x-type = 2
+ nx     = 1
+ xmin   =-0.25
+ xmax   = 0.25
+ y-type = 2
+ ny     = 1
+ ymin   = 19.85
+ ymax   = 20.15
+ z-type = 2
+ nz     = 80
+ zmin   =-5.0
+ zmax   = 5.0
+ output = dose
+ unit   = 0
+ axis   = z
+ epsout = 0
+
+[ T-deposit ]
+ title  = [t-deposit: icntl=0]
+ file   = deposit-z-water-300.out
+ mesh   = xyz
+ x-type = 2
+ nx     = 1
+ xmin   =-0.25
+ xmax   = 0.25
+ y-type = 2
+ ny     = 1
+ ymin   = 29.85
+ ymax   = 30.15
+ z-type = 2
+ nz     = 80
+ zmin   =-5.0
+ zmax   = 5.0
+ output = dose
+ unit   = 0
+ axis   = z
+ epsout = 0
+
+[ T-deposit ] off
+ title  = [t-deposit: icntl=0]
+ file   = deposit-water.out
+ mesh   = reg
+ reg    = 10
+ output = dose
+ unit   = 0
+ axis   = reg
+
+[ T-deposit ]
+ title  = [t-deposit: icntl=0]
+ file   = deposit-y-water.out
+ mesh   = xyz
+ x-type = 2
+ nx     = 1
+ xmin   =-0.1
+ xmax   = 0.1
+ y-type = 2
+ ny     = 150
+ ymin   = 0.0
+ ymax   = 30.0
+ z-type = 2
+ nz     = 1
+ zmin   =-0.1
+ zmax   = 0.1
+ output = dose
+ unit   = 0
+ axis   = y
+ epsout = 1
+
+[ T-deposit ] off
+ title  = [t-deposit: icntl=0]
+ file   = deposit-x-water.out
+ mesh   = xyz
+ x-type = 2
+ nx     = 50
+ xmin   = -5.0
+ xmax   =  5.0
+ y-type = 2
+ ny     = 1
+ ymin   =  9.85
+ ymax   = 10.15
+ z-type = 2
+ nz     = 1
+ zmin   =-0.25
+ zmax   = 0.25
+ output = dose
+ unit   = 0
+ axis   = x
+ epsout = 1
+
+[ T-track ] off
+ title  = [t-track: icntl=0]
+ file   = track-yz-water.out
+ mesh   = xyz
+ x-type = 2
+ nx     =  1
+ xmin   = c91-20
+ xmax   = c91+20
+ y-type = 2
+ ny     =  100
+ ymin   = c92-110
+ ymax   = c92+10
+ z-type = 2
+ nz     =  40
+ zmin   = c93-20
+ zmax   = c93+20
+ e-type = 2
+ ne     = 1
+ emin   = 0.0
+ emax   = 1000
+ axis   = yz
+ gshow  = 1
+ epsout = 1
+
+[ T-track ] off
+ title  = [t-track: icntl=0]
+ file   = track-xz-water.out
+ mesh   = xyz
+ x-type = 2
+ nx     =  80
+ xmin   = c91-10
+ xmax   = c91+10
+ y-type = 2
+ ny     =    1
+ ymin   = c92-0.1
+ ymax   = c92+0.1
+ z-type = 2
+ nz     =  80
+ zmin   = c93-10
+ zmax   = c93+10
+ e-type = 2
+ ne     = 1
+ emin   = 0.0
+ emax   = 1000
+ axis   = xz
+ epsout = 1
+
+[ T - C r o s s ]
+    title = energy spectrum
+     mesh =  xyz            # mesh type is xyz scoring mesh
+   x-type =    2            # x-mesh is linear given by xmin, xmax and nx
+     xmin =  -0.300000      # minimum value of x-mesh points
+     xmax =   0.300000      # maximum value of x-mesh points
+       nx =    1            # number of x-mesh points
+   y-type =    1            # e-mesh is given by the below data
+       ny =    1            # number of e-mesh points
+               -30.0  -10.0
+   z-type =    2            # z-mesh is linear given by ymin, ymax and ny
+     zmin =  -0.300000      # minimum value of z-mesh points
+     zmax =   0.300000      # maximum value of z-mesh points
+       nz =    1            # number of z-mesh points
+   e-type =    2            # e-mesh is log given by emin, emax and ne
+     emin =    0.00000      # minimum value of e-mesh points
+     emax =    7.00000      # maximum value of e-mesh points
+       ne =   70            # number of e-mesh points
+     unit =    2            # unit is [1/cm^2/MeV/source]
+     axis =  eng            # axis of output
+     file = cross_eng-w.out   # file name of output for the above axis
+   output = flux            # surface crossing flux
+     part =  photon     electron
+   epsout =    1            # (D=0) generate eps file by ANGEL
+    angel = ylin
+   stdcut = 0.01
+
+[ End ]
