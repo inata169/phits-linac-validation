@@ -1,4 +1,4 @@
-import argparse
+﻿import argparse
 import os
 import re
 import sys
@@ -14,16 +14,16 @@ try:
     import matplotlib.pyplot as plt
     from scipy.signal import savgol_filter
 except ModuleNotFoundError as e:
-    print(f"依存ライブラリが見つかりません: {e}. pip install pymedphys matplotlib scipy を実行してください。", file=sys.stderr)
+    print(f"萓晏ｭ倥Λ繧､繝悶Λ繝ｪ縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ: {e}. pip install pymedphys matplotlib scipy 繧貞ｮ溯｡後＠縺ｦ縺上□縺輔＞縲・, file=sys.stderr)
     sys.exit(1)
 
 
 def load_csv_profile(path: str) -> Tuple[np.ndarray, np.ndarray]:
     df = pd.read_csv(path, encoding='utf-8-sig', header=None)
-    # ヘッダ行がある場合を考慮: 先頭行に(cm)があればスキップ
+    # 繝倥ャ繝陦後′縺ゅｋ蝣ｴ蜷医ｒ閠・・: 蜈磯ｭ陦後↓(cm)縺後≠繧後・繧ｹ繧ｭ繝・・
     if df.shape[1] >= 2 and isinstance(df.iloc[0, 0], str) and '(cm)' in df.iloc[0, 0]:
         df = pd.read_csv(path, encoding='utf-8-sig')
-        # 先頭2列に限定
+        # 蜈磯ｭ2蛻励↓髯仙ｮ・
         cols = list(df.columns)[:2]
         df = df[cols]
         df.columns = ['pos', 'dose']
@@ -35,35 +35,35 @@ def load_csv_profile(path: str) -> Tuple[np.ndarray, np.ndarray]:
     mask = np.isfinite(pos) & np.isfinite(dose)
     pos = pos[mask]
     dose = dose[mask]
-    # 位置で昇順ソート（補間の安定化のため）
+    # 菴咲ｽｮ縺ｧ譏・・た繝ｼ繝茨ｼ郁｣憺俣縺ｮ螳牙ｮ壼喧縺ｮ縺溘ａ・・
     order = np.argsort(pos)
     pos = pos[order]
     dose = dose[order]
-    # 正規化 [0,1]
+    # 豁｣隕丞喧 [0,1]
     if dose.size == 0:
-        raise ValueError(f"CSVに有効な数値データがありません: {path}")
+        raise ValueError(f"CSV縺ｫ譛牙柑縺ｪ謨ｰ蛟､繝・・繧ｿ縺後≠繧翫∪縺帙ｓ: {path}")
     dmax = np.max(dose)
     if dmax <= 0:
-        raise ValueError(f"CSVの線量最大値が0以下です: {path}")
+        raise ValueError(f"CSV縺ｮ邱夐㍼譛螟ｧ蛟､縺・莉･荳九〒縺・ {path}")
     dose_norm = dose / dmax
     return pos.astype(float), dose_norm.astype(float)
 
 
 def parse_phits_out_profile(path: str) -> Tuple[str, np.ndarray, np.ndarray, dict]:
     """
-    PHITS [T-Deposit] 出力から1Dプロファイルを抽出。
-    戻り値: (axis, pos_cm, dose_norm, meta)
-    - axis: 'x'/'y'/'z' のうち、出力軸（"axis =" に依存）
-    - pos_cm: ビン中心位置（cm）
-    - dose_norm: ビンの線量（最大=1で正規化）
-    - meta: 追加情報（例: y-slab範囲など）
+    PHITS [T-Deposit] 蜃ｺ蜉帙°繧・D繝励Ο繝輔ぃ繧､繝ｫ繧呈歓蜃ｺ縲・
+    謌ｻ繧雁､: (axis, pos_cm, dose_norm, meta)
+    - axis: 'x'/'y'/'z' 縺ｮ縺・■縲∝・蜉幄ｻｸ・・axis =" 縺ｫ萓晏ｭ假ｼ・
+    - pos_cm: 繝薙Φ荳ｭ蠢・ｽ咲ｽｮ・・m・・
+    - dose_norm: 繝薙Φ縺ｮ邱夐㍼・域怙螟ｧ=1縺ｧ豁｣隕丞喧・・
+    - meta: 霑ｽ蜉諠・ｱ・井ｾ・ y-slab遽・峇縺ｪ縺ｩ・・
     """
     with open(path, 'r', encoding='utf-8', errors='ignore') as f:
         lines = f.readlines()
 
     axis = None
     y_slab = None
-    # 軸・スラブ情報
+    # 霆ｸ繝ｻ繧ｹ繝ｩ繝匁ュ蝣ｱ
     for i, line in enumerate(lines):
         s = line.strip().lower().replace(' ', '')
         if s.startswith('axis='):
@@ -78,7 +78,7 @@ def parse_phits_out_profile(path: str) -> Tuple[str, np.ndarray, np.ndarray, dic
                 except Exception:
                     pass
 
-    # データ部を探す: ヘッダ 'h:' の後、"#  y-lower      y-upper      all         r.err" 行に続く数表
+    # 繝・・繧ｿ驛ｨ繧呈爾縺・ 繝倥ャ繝 'h:' 縺ｮ蠕後・#  y-lower      y-upper      all         r.err" 陦後↓邯壹￥謨ｰ陦ｨ
     data_start = None
     for i, line in enumerate(lines):
         if line.strip().startswith('#  y-lower'):
@@ -91,7 +91,7 @@ def parse_phits_out_profile(path: str) -> Tuple[str, np.ndarray, np.ndarray, dic
             data_start = i + 1
             break
     if data_start is None:
-        raise ValueError(f"PHITSデータ表の開始位置が見つかりません: {path}")
+        raise ValueError(f"PHITS繝・・繧ｿ陦ｨ縺ｮ髢句ｧ倶ｽ咲ｽｮ縺瑚ｦ九▽縺九ｊ縺ｾ縺帙ｓ: {path}")
 
     pos_centers = []
     vals = []
@@ -116,10 +116,10 @@ def parse_phits_out_profile(path: str) -> Tuple[str, np.ndarray, np.ndarray, dic
     pos = np.asarray(pos_centers, dtype=float)
     dose = np.asarray(vals, dtype=float)
     if dose.size == 0:
-        raise ValueError(f"PHITSデータが空です: {path}")
+        raise ValueError(f"PHITS繝・・繧ｿ縺檎ｩｺ縺ｧ縺・ {path}")
     dmax = np.max(dose)
     if dmax <= 0:
-        raise ValueError(f"PHITS線量最大値が0以下です: {path}")
+        raise ValueError(f"PHITS邱夐㍼譛螟ｧ蛟､縺・莉･荳九〒縺・ {path}")
     dose_norm = dose / dmax
     meta = {}
     if y_slab is not None:
@@ -147,43 +147,40 @@ def _extract_depth_cm_from_phits_filename(filename: str) -> Optional[float]:
 
 def normalize_pdd(pos_cm: np.ndarray, dose_norm: np.ndarray, mode: str, z_ref_cm: float) -> Tuple[np.ndarray, np.ndarray]:
     if mode == 'z_ref':
-        # 参照深で1.0になるよう正規化
+        # 蜿ら・豺ｱ縺ｧ1.0縺ｫ縺ｪ繧九ｈ縺・ｭ｣隕丞喧
         ref = np.interp(z_ref_cm, pos_cm, dose_norm)
         if ref <= 0:
-            raise ValueError(f"z_ref={z_ref_cm} cm のPDDが0以下のため正規化できません")
+            raise ValueError(f"z_ref={z_ref_cm} cm 縺ｮPDD縺・莉･荳九・縺溘ａ豁｣隕丞喧縺ｧ縺阪∪縺帙ｓ")
         return pos_cm, (dose_norm / ref)
-    # 既定 dmax
+    # 譌｢螳・dmax
     dmax = np.max(dose_norm)
     return pos_cm, (dose_norm / dmax)
 
 
 def ocr_center_normalize(pos_cm: np.ndarray, dose_norm: np.ndarray, tol_cm: float = 0.05) -> Tuple[np.ndarray, np.ndarray]:
-    """中心(ビーム中心)の位置と振幅を正規化。
-    - 位置: 中心候補の座標を0 cmに平行移動（座標再中心化）
-    - 振幅: 中心点の線量を1.00にスケーリング（近傍±tolに点が無ければ最大値）
+    """荳ｭ蠢・繝薙・繝荳ｭ蠢・縺ｮ菴咲ｽｮ縺ｨ謖ｯ蟷・ｒ豁｣隕丞喧縲・
+    - 菴咲ｽｮ: 荳ｭ蠢・呵｣懊・蠎ｧ讓吶ｒ0 cm縺ｫ蟷ｳ陦檎ｧｻ蜍包ｼ亥ｺｧ讓吝・荳ｭ蠢・喧・・
+    - 謖ｯ蟷・ 荳ｭ蠢・せ縺ｮ邱夐㍼繧・.00縺ｫ繧ｹ繧ｱ繝ｼ繝ｪ繝ｳ繧ｰ・郁ｿ大ｍﾂｱtol縺ｫ轤ｹ縺檎┌縺代ｌ縺ｰ譛螟ｧ蛟､・・
     """
-    # 中心候補のインデックス（x=0に最も近い）
+    # 荳ｭ蠢・呵｣懊・繧､繝ｳ繝・ャ繧ｯ繧ｹ・・=0縺ｫ譛繧りｿ代＞・・
     idx_center = int(np.argmin(np.abs(pos_cm))) if pos_cm.size else 0
     x_center = pos_cm[idx_center] if pos_cm.size else 0.0
-    # 座標を中心が0になるように平行移動
+    # 蠎ｧ讓吶ｒ荳ｭ蠢・′0縺ｫ縺ｪ繧九ｈ縺・↓蟷ｳ陦檎ｧｻ蜍・
     pos_centered = pos_cm - x_center
-    # 振幅スケーリング参照値
+    # 謖ｯ蟷・せ繧ｱ繝ｼ繝ｪ繝ｳ繧ｰ蜿ら・蛟､
     if abs(x_center) <= tol_cm:
         c = dose_norm[idx_center]
     else:
-        # 近傍に中心サンプルが無い場合は最大値を基準とする
+        # 霑大ｍ縺ｫ荳ｭ蠢・し繝ｳ繝励Ν縺檎┌縺・ｴ蜷医・譛螟ｧ蛟､繧貞渕貅悶→縺吶ｋ
         c = float(np.max(dose_norm)) if dose_norm.size else 1.0
     if c <= 0:
-        raise ValueError("OCR中心正規化の基準が0以下です")
+        raise ValueError("OCR荳ｭ蠢・ｭ｣隕丞喧縺ｮ蝓ｺ貅悶′0莉･荳九〒縺・)
     return pos_centered, (dose_norm / c)
 
 
 def ocr_center_normalize_with_options(pos_cm: np.ndarray, dose_norm: np.ndarray,
                                       tol_cm: float = 0.05, interp: bool = False) -> Tuple[np.ndarray, np.ndarray]:
-    """中心位置合わせと振幅の中心正規化（補間オプション付き）。
-    - 位置: 中心に最も近いサンプルの座標を原点へ平行移動
-    - 振幅: x=0 の値を基準に 1.00 へスケーリング（x=0 サンプルが tol 以内に無い場合、interp 指定時は線形補間を試みる。不可なら最大値で代用）
-    """
+    """荳ｭ蠢・ｽ咲ｽｮ蜷医ｏ縺帙→謖ｯ蟷・・荳ｭ蠢・ｭ｣隕丞喧・郁｣憺俣繧ｪ繝励す繝ｧ繝ｳ莉倥″・峨・    - 菴咲ｽｮ: 荳ｭ蠢・↓譛繧りｿ代＞繧ｵ繝ｳ繝励Ν縺ｮ蠎ｧ讓吶ｒ蜴溽せ縺ｸ蟷ｳ陦檎ｧｻ蜍・    - 謖ｯ蟷・ x=0 縺ｮ蛟､繧貞渕貅悶↓ 1.00 縺ｸ繧ｹ繧ｱ繝ｼ繝ｪ繝ｳ繧ｰ・・=0 繧ｵ繝ｳ繝励Ν縺・tol 莉･蜀・↓辟｡縺・ｴ蜷医（nterp 謖・ｮ壽凾縺ｯ邱壼ｽ｢陬憺俣繧定ｩｦ縺ｿ繧九ゆｸ榊庄縺ｪ繧画怙螟ｧ蛟､縺ｧ莉｣逕ｨ・・    """
     if pos_cm.size == 0:
         return pos_cm, dose_norm
     idx_center = int(np.argmin(np.abs(pos_cm)))
@@ -206,7 +203,7 @@ def ocr_center_normalize_with_options(pos_cm: np.ndarray, dose_norm: np.ndarray,
         if c is None:
             c = float(np.max(dose_norm)) if dose_norm.size else 1.0
     if c <= 0:
-        raise ValueError("OCR中心正規化の基準が0以下です")
+        raise ValueError("OCR荳ｭ蠢・ｭ｣隕丞喧縺ｮ蝓ｺ貅悶′0莉･荳九〒縺・)
     return pos_centered, (dose_norm / c)
 
 def resample_common_grid(x1: np.ndarray, y1: np.ndarray, x2: np.ndarray, y2: np.ndarray, step_cm: Optional[float]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -230,12 +227,12 @@ def compute_rmse(y_ref: np.ndarray, y_eval: np.ndarray) -> float:
 def compute_gamma_pass(x_ref_cm: np.ndarray, y_ref_true: np.ndarray,
                        x_eval_cm: np.ndarray, y_eval_true: np.ndarray,
                        dd_percent: float, dta_mm: float, cutoff_percent: float) -> float:
-    # γのため、基準を%スケールへ（最大=100%）
+    # ﾎｳ縺ｮ縺溘ａ縲∝渕貅悶ｒ%繧ｹ繧ｱ繝ｼ繝ｫ縺ｸ・域怙螟ｧ=100%・・
     if np.max(y_ref_true) <= 0:
         return 0.0
     ref_pct = (y_ref_true / np.max(y_ref_true)) * 100.0
-    eval_pct = (y_eval_true / np.max(y_ref_true)) * 100.0  # 基準正規化に合わせる
-    # 軸をmmへ
+    eval_pct = (y_eval_true / np.max(y_ref_true)) * 100.0  # 蝓ｺ貅匁ｭ｣隕丞喧縺ｫ蜷医ｏ縺帙ｋ
+    # 霆ｸ繧知m縺ｸ
     x_ref_mm = x_ref_cm * 10.0
     x_eval_mm = x_eval_cm * 10.0
     gamma = pymedphys.gamma(
@@ -254,104 +251,43 @@ def compute_gamma_pass(x_ref_cm: np.ndarray, y_ref_true: np.ndarray,
 
 
 def main():
-    parser = argparse.ArgumentParser(description='PDD重み付け真値スケーリングでOCRを比較 (γ/RMSE)')
-    # PDD 入力
+    parser = argparse.ArgumentParser(description='PDD驥阪∩莉倥￠逵溷､繧ｹ繧ｱ繝ｼ繝ｪ繝ｳ繧ｰ縺ｧOCR繧呈ｯ碑ｼ・(ﾎｳ/RMSE)')
+    # PDD 蜈･蜉・
     parser.add_argument('--ref-pdd-type', choices=['csv', 'phits'], required=True)
     parser.add_argument('--ref-pdd-file', required=True)
     parser.add_argument('--eval-pdd-type', choices=['csv', 'phits'], required=True)
     parser.add_argument('--eval-pdd-file', required=True)
-    # OCR 入力
+    # OCR 蜈･蜉・
     parser.add_argument('--ref-ocr-type', choices=['csv', 'phits'], required=True)
     parser.add_argument('--ref-ocr-file', required=True)
     parser.add_argument('--eval-ocr-type', choices=['csv', 'phits'], required=True)
     parser.add_argument('--eval-ocr-file', required=True)
-    # 正規化
+    # 豁｣隕丞喧
     parser.add_argument('--norm-mode', choices=['dmax', 'z_ref'], default='dmax')
     parser.add_argument('--z-ref', type=float, default=10.0)
-    # 評価条件
+    # 隧穂ｾ｡譚｡莉ｶ
     parser.add_argument('--dd1', type=float, default=2.0)
     parser.add_argument('--dta1', type=float, default=2.0)
     parser.add_argument('--dd2', type=float, default=3.0)
     parser.add_argument('--dta2', type=float, default=3.0)
     parser.add_argument('--cutoff', type=float, default=10.0)
-    # 平滑化・再サンプル・可視化
-    parser.add_argument('--smooth-window', type=int, default=5, help='Savitzky-Golay平滑のウィンドウ（奇数, デフォルト5）')
-    parser.add_argument('--smooth-order', type=int, default=2, help='Savitzky-Golay平滑の次数（デフォルト2）')
-    parser.add_argument('--no-smooth', action='store_true', help='平滑化を無効化する')
-    parser.add_argument('--grid', type=float, default=None, help='RMSE/可視化の共通グリッド刻み[cm] (未指定はconfig.iniのProcessing.resample_grid_cm)')
-    parser.add_argument('--ymin', type=float, default=None, help='プロットのY最小値')
-    parser.add_argument('--ymax', type=float, default=None, help='プロットのY最大値')
-    parser.add_argument('--export-csv', action='store_true', help='真値系列（必要に応じて再サンプル系列も）をCSVに保存する')
-    parser.add_argument('--export-gamma', action='store_true', help='基準系列点ごとのγをCSVに保存する（共通グリッド使用時はそのグリッドで）')
-    parser.add_argument('--xlim-symmetric', action='store_true', help='横軸を原点対称範囲に設定する')
-    parser.add_argument('--legend-ref', type=str, default=None, help='凡例のrefラベルを指定')
-    parser.add_argument('--legend-eval', type=str, default=None, help='凡例のevalラベルを指定')
-    parser.add_argument('--center-tol-cm', type=float, default=0.05, help='中心正規化でx=0近傍と見なす許容範囲[cm]（既定0.05）')
-    parser.add_argument('--center-interp', action='store_true', help='x=0にサンプルが無い場合、線形補間でx=0の値を推定して中心正規化に使用する')
+    # 蟷ｳ貊大喧繝ｻ蜀阪し繝ｳ繝励Ν繝ｻ蜿ｯ隕門喧
+    parser.add_argument('--smooth-window', type=int, default=5, help='Savitzky-Golay蟷ｳ貊代・繧ｦ繧｣繝ｳ繝峨え・亥･・焚, 繝・ヵ繧ｩ繝ｫ繝・・・)
+    parser.add_argument('--smooth-order', type=int, default=2, help='Savitzky-Golay蟷ｳ貊代・谺｡謨ｰ・医ョ繝輔か繝ｫ繝・・・)
+    parser.add_argument('--no-smooth', action='store_true', help='蟷ｳ貊大喧繧堤┌蜉ｹ蛹悶☆繧・)
+    parser.add_argument('--grid', type=float, default=None, help='RMSE/蜿ｯ隕門喧縺ｮ蜈ｱ騾壹げ繝ｪ繝・ラ蛻ｻ縺ｿ[cm] (譛ｪ謖・ｮ壹・config.ini縺ｮProcessing.resample_grid_cm)')
+    parser.add_argument('--ymin', type=float, default=None, help='繝励Ο繝・ヨ縺ｮY譛蟆丞､')
+    parser.add_argument('--ymax', type=float, default=None, help='繝励Ο繝・ヨ縺ｮY譛螟ｧ蛟､')
+    parser.add_argument('--export-csv', action='store_true', help='逵溷､邉ｻ蛻暦ｼ亥ｿ・ｦ√↓蠢懊§縺ｦ蜀阪し繝ｳ繝励Ν邉ｻ蛻励ｂ・峨ｒCSV縺ｫ菫晏ｭ倥☆繧・)
+    parser.add_argument('--export-gamma', action='store_true', help='蝓ｺ貅也ｳｻ蛻礼せ縺斐→縺ｮﾎｳ繧辰SV縺ｫ菫晏ｭ倥☆繧具ｼ亥・騾壹げ繝ｪ繝・ラ菴ｿ逕ｨ譎ゅ・縺昴・繧ｰ繝ｪ繝・ラ縺ｧ・・)
+    parser.add_argument('--xlim-symmetric', action='store_true', help='讓ｪ霆ｸ繧貞次轤ｹ蟇ｾ遘ｰ遽・峇縺ｫ險ｭ螳壹☆繧・)
+    parser.add_argument('--legend-ref', type=str, default=None, help='蜃｡萓九・ref繝ｩ繝吶Ν繧呈欠螳・)
+    parser.add_argument('--legend-eval', type=str, default=None, help='蜃｡萓九・eval繝ｩ繝吶Ν繧呈欠螳・)
+    parser.add_argument('--center-tol-cm', type=float, default=0.05, help='荳ｭ蠢・ｭ｣隕丞喧縺ｧx=0霑大ｍ縺ｨ隕九↑縺呵ｨｱ螳ｹ遽・峇[cm]・域里螳・.05・・)
+    parser.add_argument('--center-interp', action='store_true', help='x=0縺ｫ繧ｵ繝ｳ繝励Ν縺檎┌縺・ｴ蜷医∫ｷ壼ｽ｢陬憺俣縺ｧx=0縺ｮ蛟､繧呈耳螳壹＠縺ｦ荳ｭ蠢・ｭ｣隕丞喧縺ｫ菴ｿ逕ｨ縺吶ｋ')
     parser.add_argument('--fwhm-warn-cm', type=float, default=1.0, help='|ΔFWHM|がこの閾値[cm]を超えた場合に警告を出力（OCR相対プロファイルから算出）')
-    args = parser.parse_args()
 
-    # config から grid 既定値
-    grid_step = args.grid
-    if grid_step is None:
-        cfg = configparser.ConfigParser()
-        project_root = os.path.dirname(os.path.abspath(__file__))
-        project_root = os.path.dirname(project_root)
-        cfg_path = os.path.join(project_root, 'config.ini')
-        if os.path.exists(cfg_path):
-            try:
-                cfg.read(cfg_path, encoding='utf-8')
-                grid_step = float(cfg.get('Processing', 'resample_grid_cm', fallback='0.1'))
-            except Exception:
-                grid_step = 0.1
-        else:
-            grid_step = 0.1
-
-    # PDD 読み込み・正規化（reference）
-    if args.ref_pdd_type == 'csv':
-        z_ref_pos, z_ref_dose = load_csv_profile(args.ref_pdd_file)
-    else:
-        axis, pos, dose, _ = parse_phits_out_profile(args.ref_pdd_file)
-        if axis.lower() not in ('y',):
-            print(f"警告: PDDは通常y軸です。axis={axis}", file=sys.stderr)
-        z_ref_pos, z_ref_dose = pos, dose
-    z_ref_pos, z_ref_norm = normalize_pdd(z_ref_pos, z_ref_dose, args.norm_mode, args.z_ref)
-
-    # PDD 読み込み・正規化（eval）
-    if args.eval_pdd_type == 'csv':
-        z_eval_pos, z_eval_dose = load_csv_profile(args.eval_pdd_file)
-    else:
-        axis, pos, dose, _ = parse_phits_out_profile(args.eval_pdd_file)
-        if axis.lower() not in ('y',):
-            print(f"警告: PDDは通常y軸です。axis={axis}", file=sys.stderr)
-        z_eval_pos, z_eval_dose = pos, dose
-    z_eval_pos, z_eval_norm = normalize_pdd(z_eval_pos, z_eval_dose, args.norm_mode, args.z_ref)
-
-    # OCR 読み込み・中心正規化（reference）
-    if args.ref_ocr_type == 'csv':
-        x_ref, ocr_ref = load_csv_profile(args.ref_ocr_file)
-        # 深さはファイル名から推定 (..10cm.. → 10.0)
-        depth_csv = _extract_depth_cm_from_csv_filename(args.ref_ocr_file)
-        if depth_csv is not None:
-            z_depth_ref = float(depth_csv)
-        else:
-            z_depth_ref = args.z_ref
-            print(f"警告: OCR(CSV) の深さをファイル名から取得できませんでした。z_ref={args.z_ref} cm を使用します", file=sys.stderr)
-    else:
-        axis, pos, dose, meta = parse_phits_out_profile(args.ref_ocr_file)
-        # PHITS OCR は lateral 軸 (xやz) のはず。深さは y_slab 中心を採用
-        z_depth_ref = meta.get('y_center_cm', None)
-        if z_depth_ref is None:
-            depth_from_name = _extract_depth_cm_from_phits_filename(args.ref_ocr_file)
-            if depth_from_name is not None:
-                z_depth_ref = float(depth_from_name)
-            else:
-                z_depth_ref = args.z_ref
-                print(f"警告: OCR(PHITS) の深さをyスラブ/ファイル名から取得できませんでした。z_ref={args.z_ref} cm を使用します", file=sys.stderr)
-        x_ref, ocr_ref = pos, dose
-    x_ref, ocr_ref_rel = ocr_center_normalize_with_options(x_ref, ocr_ref, tol_cm=args.center_tol_cm, interp=args.center_interp)
-
-    # OCR 読み込み・中心正規化（eval）
+    # OCR 隱ｭ縺ｿ霎ｼ縺ｿ繝ｻ荳ｭ蠢・ｭ｣隕丞喧・・val・・
     if args.eval_ocr_type == 'csv':
         x_eval, ocr_eval = load_csv_profile(args.eval_ocr_file)
         depth_csv = _extract_depth_cm_from_csv_filename(args.eval_ocr_file)
@@ -359,7 +295,7 @@ def main():
             z_depth_eval = float(depth_csv)
         else:
             z_depth_eval = args.z_ref
-            print(f"警告: OCR(CSV) の深さをファイル名から取得できませんでした。z_ref={args.z_ref} cm を使用します", file=sys.stderr)
+            print(f"隴ｦ蜻・ OCR(CSV) 縺ｮ豺ｱ縺輔ｒ繝輔ぃ繧､繝ｫ蜷阪°繧牙叙蠕励〒縺阪∪縺帙ｓ縺ｧ縺励◆縲・_ref={args.z_ref} cm 繧剃ｽｿ逕ｨ縺励∪縺・, file=sys.stderr)
     else:
         axis, pos, dose, meta = parse_phits_out_profile(args.eval_ocr_file)
         z_depth_eval = meta.get('y_center_cm', None)
@@ -369,11 +305,11 @@ def main():
                 z_depth_eval = float(depth_from_name)
             else:
                 z_depth_eval = args.z_ref
-                print(f"警告: OCR(PHITS) の深さをyスラブ/ファイル名から取得できませんでした。z_ref={args.z_ref} cm を使用します", file=sys.stderr)
+                print(f"隴ｦ蜻・ OCR(PHITS) 縺ｮ豺ｱ縺輔ｒy繧ｹ繝ｩ繝・繝輔ぃ繧､繝ｫ蜷阪°繧牙叙蠕励〒縺阪∪縺帙ｓ縺ｧ縺励◆縲・_ref={args.z_ref} cm 繧剃ｽｿ逕ｨ縺励∪縺・, file=sys.stderr)
         x_eval, ocr_eval = pos, dose
     x_eval, ocr_eval_rel = ocr_center_normalize_with_options(x_eval, ocr_eval, tol_cm=args.center_tol_cm, interp=args.center_interp)
 
-    # 軽い平滑化（Savitzky–Golay）。データ点数が不足/条件不一致ならスキップ
+    # 霆ｽ縺・ｹｳ貊大喧・・avitzky窶敵olay・峨ゅョ繝ｼ繧ｿ轤ｹ謨ｰ縺御ｸ崎ｶｳ/譚｡莉ｶ荳堺ｸ閾ｴ縺ｪ繧峨せ繧ｭ繝・・
     if not args.no_smooth:
         try:
             w = args.smooth_window if args.smooth_window % 2 == 1 else args.smooth_window + 1
@@ -382,7 +318,7 @@ def main():
                 ocr_ref_rel = savgol_filter(ocr_ref_rel, w, o)
             if w > o and len(ocr_eval_rel) >= w:
                 ocr_eval_rel = savgol_filter(ocr_eval_rel, w, o)
-            # 平滑後も最大値が1.00となるよう再正規化
+            # 蟷ｳ貊大ｾ後ｂ譛螟ｧ蛟､縺・.00縺ｨ縺ｪ繧九ｈ縺・・豁｣隕丞喧
             ref_max = float(np.max(ocr_ref_rel)) if len(ocr_ref_rel) else 1.0
             eval_max = float(np.max(ocr_eval_rel)) if len(ocr_eval_rel) else 1.0
             if ref_max > 0:
@@ -392,10 +328,10 @@ def main():
         except Exception:
             pass
 
-    # True(x,z) 構築
+    # True(x,z) 讒狗ｯ・
     s_axis_ref = float(np.interp(z_depth_ref, z_ref_pos, z_ref_norm))
     s_axis_eval = float(np.interp(z_depth_eval, z_eval_pos, z_eval_norm))
-    # FWHM（相対OCRで計算）
+    # FWHM・育嶌蟇ｾOCR縺ｧ險育ｮ暦ｼ・
     def _compute_fwhm(pos_cm: np.ndarray, dose_norm: np.ndarray) -> Optional[float]:
         if pos_cm.size < 3 or dose_norm.size < 3:
             return None
@@ -432,30 +368,29 @@ def main():
         except Exception:
             thr = 1.0
         if abs(fwhm_delta) > thr:
-            print(f"警告: FWHMミスマッチ |Δ|={abs(fwhm_delta):.3f} cm (> {thr:.3f} cm). ref={fwhm_ref:.3f} cm, eval={fwhm_eval:.3f} cm", file=sys.stderr)
-            # 照射野の候補Revをヒント表示（経験則）
-            try:
+            print(f"隴ｦ蜻・ FWHM繝溘せ繝槭ャ繝・|ﾎ培={abs(fwhm_delta):.3f} cm (> {thr:.3f} cm). ref={fwhm_ref:.3f} cm, eval={fwhm_eval:.3f} cm", file=sys.stderr)
+            # 辣ｧ蟆・㍽縺ｮ蛟呵｣彝ev繧偵ヲ繝ｳ繝郁｡ｨ遉ｺ・育ｵ碁ｨ灘援・・            try:
                 ref_name = os.path.basename(args.ref_ocr_file).lower()
                 hint = None
                 if '05x05m' in ref_name or '5x5' in ref_name:
-                    hint = '5x5 → Rev80-5x5-...（または Rev60-5x5-...）'
+                    hint = '5x5 竊・Rev80-5x5-...・医∪縺溘・ Rev60-5x5-...・・
                 elif '10x10m' in ref_name or '10x10' in ref_name:
-                    hint = '10x10 → Rev70-c8-0.49n'
+                    hint = '10x10 竊・Rev70-c8-0.49n'
                 elif '30x30m' in ref_name or '30x30' in ref_name:
-                    hint = '30x30 → Rev50-30x30--c8-0.49n'
+                    hint = '30x30 竊・Rev50-30x30--c8-0.49n'
                 if hint:
-                    print(f"ヒント: 比較対象のPHITSデータの照射野が異なる可能性があります（{hint}）。", file=sys.stderr)
+                    print(f"繝偵Φ繝・ 豈碑ｼ・ｯｾ雎｡縺ｮPHITS繝・・繧ｿ縺ｮ辣ｧ蟆・㍽縺檎焚縺ｪ繧句庄閭ｽ諤ｧ縺後≠繧翫∪縺呻ｼ・hint}・峨・, file=sys.stderr)
             except Exception:
                 pass
 
     y_true_ref = s_axis_ref * ocr_ref_rel
     y_true_eval = s_axis_eval * ocr_eval_rel
 
-    # RMSE（共通グリッド）
+    # RMSE・亥・騾壹げ繝ｪ繝・ラ・・
     grid, y_ref_g, y_eval_g = resample_common_grid(x_ref, y_true_ref, x_eval, y_true_eval, grid_step)
     if grid is not None:
         rmse = compute_rmse(y_ref_g, y_eval_g)
-        print(f"RMSE (共通グリッド {grid_step:.3f} cm): {rmse:.6f}")
+        print(f"RMSE (蜈ｱ騾壹げ繝ｪ繝・ラ {grid_step:.3f} cm): {rmse:.6f}")
         x_for_gamma_ref = grid
         y_for_gamma_ref = y_ref_g
         x_for_gamma_eval = grid
@@ -468,7 +403,7 @@ def main():
         x_for_gamma_eval = x_eval
         y_for_gamma_eval = y_true_eval
 
-    # γ（主要/副次）
+    # ﾎｳ・井ｸｻ隕・蜑ｯ谺｡・・
     g1 = compute_gamma_pass(x_for_gamma_ref, y_for_gamma_ref, x_for_gamma_eval, y_for_gamma_eval,
                             dd_percent=args.dd1, dta_mm=args.dta1, cutoff_percent=args.cutoff)
     g2 = compute_gamma_pass(x_for_gamma_ref, y_for_gamma_ref, x_for_gamma_eval, y_for_gamma_eval,
@@ -476,7 +411,7 @@ def main():
     print(f"Gamma pass (DD={args.dd1:.1f}%, DTA={args.dta1:.1f}mm, Cutoff={args.cutoff:.1f}%): {g1:.2f}%")
     print(f"Gamma pass (DD={args.dd2:.1f}%, DTA={args.dta2:.1f}mm, Cutoff={args.cutoff:.1f}%): {g2:.2f}%")
 
-    # 出力先（output/plots, output/reports）
+    # 蜃ｺ蜉帛・・・utput/plots, output/reports・・
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     out_root = None
     cfg_out = configparser.ConfigParser()
@@ -494,14 +429,14 @@ def main():
     os.makedirs(plot_dir, exist_ok=True)
     os.makedirs(report_dir, exist_ok=True)
 
-    # 図保存（True スケールの比較）
+    # 蝗ｳ菫晏ｭ假ｼ・rue 繧ｹ繧ｱ繝ｼ繝ｫ縺ｮ豈碑ｼ・ｼ・
     ref_ocr_base = os.path.splitext(os.path.basename(args.ref_ocr_file))[0]
     eval_ocr_base = os.path.splitext(os.path.basename(args.eval_ocr_file))[0]
     title = (
-        f"PDD重み付け 真値スケーリング\n"
+        f"PDD驥阪∩莉倥￠ 逵溷､繧ｹ繧ｱ繝ｼ繝ｪ繝ｳ繧ｰ\n"
         f"norm={args.norm_mode}, z_ref={args.z_ref} cm / ref_z={z_depth_ref:.3f} cm, eval_z={z_depth_eval:.3f} cm"
     )
-    # 日本語フォントの設定（図保存時の警告抑止）
+    # 譌･譛ｬ隱槭ヵ繧ｩ繝ｳ繝医・險ｭ螳夲ｼ亥峙菫晏ｭ俶凾縺ｮ隴ｦ蜻頑椛豁｢・・
     try:
         import matplotlib as _mpl
         _mpl.rcParams['font.family'] = ['Yu Gothic', 'Meiryo', 'MS Gothic', 'Noto Sans CJK JP', 'Noto Sans JP', 'IPAexGothic', 'DejaVu Sans']
@@ -509,27 +444,27 @@ def main():
     except Exception:
         pass
     plt.figure(figsize=(12, 8))
-    ref_label = args.legend_ref if args.legend_ref else f'真値(ref): {ref_ocr_base}'
-    eval_label = args.legend_eval if args.legend_eval else f'真値(eval): {eval_ocr_base}'
+    ref_label = args.legend_ref if args.legend_ref else f'逵溷､(ref): {ref_ocr_base}'
+    eval_label = args.legend_eval if args.legend_eval else f'逵溷､(eval): {eval_ocr_base}'
     plt.plot(x_for_gamma_ref, y_for_gamma_ref, label=ref_label, color='blue', lw=2.2)
     plt.plot(x_for_gamma_eval, y_for_gamma_eval, label=eval_label, color='red', lw=2.2, linestyle='--')
     plt.title(title, fontsize=14)
-    plt.xlabel('横方向位置 (cm)')
-    plt.ylabel('真値線量 (PDD重み付け, 任意単位)')
+    plt.xlabel('讓ｪ譁ｹ蜷台ｽ咲ｽｮ (cm)')
+    plt.ylabel('逵溷､邱夐㍼ (PDD驥阪∩莉倥￠, 莉ｻ諢丞腰菴・')
     plt.grid(True, linestyle='--', alpha=0.5)
     plt.legend()
-    # 概要テキスト（RMSE/γ）を図内に表示
+    # 讎りｦ√ユ繧ｭ繧ｹ繝茨ｼ・MSE/ﾎｳ・峨ｒ蝗ｳ蜀・↓陦ｨ遉ｺ
     summary = (
         f"RMSE: {rmse:.4f}\n"
-        f"γ1 ({args.dd1:.0f}%/{args.dta1:.0f}mm/{args.cutoff:.0f}%): {g1:.2f}%\n"
-        f"γ2 ({args.dd2:.0f}%/{args.dta2:.0f}mm/{args.cutoff:.0f}%): {g2:.2f}%\n"
+        f"ﾎｳ1 ({args.dd1:.0f}%/{args.dta1:.0f}mm/{args.cutoff:.0f}%): {g1:.2f}%\n"
+        f"ﾎｳ2 ({args.dd2:.0f}%/{args.dta2:.0f}mm/{args.cutoff:.0f}%): {g2:.2f}%\n"
         f"S_axis(ref)={s_axis_ref:.3f}, S_axis(eval)={s_axis_eval:.3f}\n"
         f"grid={grid_step:.3f} cm"
     )
     plt.gca().text(0.02, 0.98, summary, transform=plt.gca().transAxes,
                    va='top', ha='left', fontsize=11,
                    bbox=dict(boxstyle='round', facecolor='white', alpha=0.8, lw=0.5))
-    # 軸範囲
+    # 霆ｸ遽・峇
     if args.ymin is not None or args.ymax is not None:
         ymin = args.ymin if args.ymin is not None else plt.gca().get_ylim()[0]
         ymax = args.ymax if args.ymax is not None else plt.gca().get_ylim()[1]
@@ -556,7 +491,7 @@ def main():
     plt.savefig(plot_path)
     print(f"Plot saved: {plot_path}")
 
-    # レポート保存
+    # 繝ｬ繝昴・繝井ｿ晏ｭ・
     report_name = (
         f"TrueReport_{ref_ocr_base}_vs_{eval_ocr_base}"
         f"_norm-{args.norm_mode}_zref-{args.z_ref:g}_z-{z_depth_ref:g}-{z_depth_eval:g}.txt"
@@ -565,32 +500,32 @@ def main():
     saved_files = [plot_path]
     try:
         with open(report_path, 'w', encoding='utf-8') as f:
-            f.write("# PDD重み付け 真値スケーリング レポート\n")
-            f.write("\n## 入力\n")
-            f.write(f"ref PDD: {args.ref_pdd_type} — {args.ref_pdd_file}\n")
-            f.write(f"eval PDD: {args.eval_pdd_type} — {args.eval_pdd_file}\n")
-            f.write(f"ref OCR: {args.ref_ocr_type} — {args.ref_ocr_file}\n")
-            f.write(f"eval OCR: {args.eval_ocr_type} — {args.eval_ocr_file}\n")
-            f.write("\n## 解析パラメータ\n")
+            f.write("# PDD驥阪∩莉倥￠ 逵溷､繧ｹ繧ｱ繝ｼ繝ｪ繝ｳ繧ｰ 繝ｬ繝昴・繝・n")
+            f.write("\n## 蜈･蜉媾n")
+            f.write(f"ref PDD: {args.ref_pdd_type} 窶・{args.ref_pdd_file}\n")
+            f.write(f"eval PDD: {args.eval_pdd_type} 窶・{args.eval_pdd_file}\n")
+            f.write(f"ref OCR: {args.ref_ocr_type} 窶・{args.ref_ocr_file}\n")
+            f.write(f"eval OCR: {args.eval_ocr_type} 窶・{args.eval_ocr_file}\n")
+            f.write("\n## 隗｣譫舌ヱ繝ｩ繝｡繝ｼ繧ｿ\n")
             f.write(f"norm-mode: {args.norm_mode}, z_ref: {args.z_ref} cm\n")
             f.write(f"ref depth (cm): {z_depth_ref:.6f}, eval depth (cm): {z_depth_eval:.6f}\n")
             f.write(f"S_axis(ref): {s_axis_ref:.6f}, S_axis(eval): {s_axis_eval:.6f}\n")
             f.write(f"grid (cm): {grid_step:.6f}\n")
             try:
                 if fwhm_ref is not None and fwhm_eval is not None:
-                    f.write(f"FWHM(ref/eval) [cm]: {fwhm_ref:.4f} / {fwhm_eval:.4f} (Δ={fwhm_delta:+.4f})\n")
+                    f.write(f"FWHM(ref/eval) [cm]: {fwhm_ref:.4f} / {fwhm_eval:.4f} (ﾎ・{fwhm_delta:+.4f})\n")
             except Exception:
                 pass
-            f.write("\n## 結果\n")
+            f.write("\n## 邨先棡\n")
             f.write(f"RMSE: {rmse:.6f}\n")
             f.write(f"Gamma 1 (DD={args.dd1:.1f}%, DTA={args.dta1:.1f}mm, Cutoff={args.cutoff:.1f}%): {g1:.2f}%\n")
             f.write(f"Gamma 2 (DD={args.dd2:.1f}%, DTA={args.dta2:.1f}mm, Cutoff={args.cutoff:.1f}%): {g2:.2f}%\n")
         print(f"Report saved: {report_path}")
         saved_files.append(report_path)
     except Exception as e:
-        print(f"レポート保存中にエラー: {e}", file=sys.stderr)
+        print(f"繝ｬ繝昴・繝井ｿ晏ｭ倅ｸｭ縺ｫ繧ｨ繝ｩ繝ｼ: {e}", file=sys.stderr)
 
-    # CSVエクスポート
+    # CSV繧ｨ繧ｯ繧ｹ繝昴・繝・
     if args.export_csv:
         data_dir = os.path.join(out_root, 'data')
         os.makedirs(data_dir, exist_ok=True)
@@ -611,10 +546,10 @@ def main():
                 print(f"CSV saved: {eval_g_csv}")
                 saved_files.extend([ref_g_csv, eval_g_csv])
             if args.export_gamma:
-                # 基準系列点ごとのγを計算して保存（pymedphys.gammaの戻り配列を利用）
+                # 蝓ｺ貅也ｳｻ蛻礼せ縺斐→縺ｮﾎｳ繧定ｨ育ｮ励＠縺ｦ菫晏ｭ假ｼ・ymedphys.gamma縺ｮ謌ｻ繧企・蛻励ｒ蛻ｩ逕ｨ・・
                 xref_mm = (x_for_gamma_ref * 10.0).astype(float)
                 xeval_mm = (x_for_gamma_eval * 10.0).astype(float)
-                # %スケール変換（基準最大=100%）
+                # %繧ｹ繧ｱ繝ｼ繝ｫ螟画鋤・亥渕貅匁怙螟ｧ=100%・・
                 ref_pct = (y_for_gamma_ref / np.max(y_for_gamma_ref)) * 100.0 if np.max(y_for_gamma_ref) > 0 else y_for_gamma_ref
                 eval_pct = (y_for_gamma_eval / np.max(y_for_gamma_ref)) * 100.0 if np.max(y_for_gamma_ref) > 0 else y_for_gamma_eval
                 gamma = pymedphys.gamma(
@@ -635,9 +570,9 @@ def main():
                 print(f"CSV saved: {gamma_csv}")
                 saved_files.append(gamma_csv)
         except Exception as e:
-            print(f"CSV出力中にエラー: {e}", file=sys.stderr)
+            print(f"CSV蜃ｺ蜉帑ｸｭ縺ｫ繧ｨ繝ｩ繝ｼ: {e}", file=sys.stderr)
 
-    # リポジトリ内にもミラー保存（output/<basename(output_dir)> 下）
+    # 繝ｪ繝昴ず繝医Μ蜀・↓繧ゅΑ繝ｩ繝ｼ菫晏ｭ假ｼ・utput/<basename(output_dir)> 荳具ｼ・
     try:
         mirror_root = os.path.join(project_root, 'output', os.path.basename(out_root.rstrip('\\/')))
         for path in saved_files:
@@ -648,8 +583,9 @@ def main():
             os.makedirs(os.path.dirname(dst), exist_ok=True)
             shutil.copy2(path, dst)
     except Exception as e:
-        print(f"警告: ミラー保存中にエラー: {e}", file=sys.stderr)
+        print(f"隴ｦ蜻・ 繝溘Λ繝ｼ菫晏ｭ倅ｸｭ縺ｫ繧ｨ繝ｩ繝ｼ: {e}", file=sys.stderr)
 
 
 if __name__ == '__main__':
     main()
+
