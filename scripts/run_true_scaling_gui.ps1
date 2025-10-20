@@ -116,13 +116,24 @@ $form.Controls.Add($btnRun); $form.Controls.Add($btnOpen); $form.Controls.Add($l
 $tbLog = New-Object System.Windows.Forms.TextBox; $tbLog.Location=New-Object System.Drawing.Point(20,368); $tbLog.Size=New-Object System.Drawing.Size(800,260); $tbLog.Multiline=$true; $tbLog.ScrollBars='Vertical'; $tbLog.ReadOnly=$true; $form.Controls.Add($tbLog)
 
 function Append-Log($text){ $tbLog.AppendText("$text`r`n") }
-function Browse-AnyFile([ref]$tb){ $dlg = New-Object System.Windows.Forms.OpenFileDialog; $dlg.Filter='All files (*.*)|*.*'; if($dlg.ShowDialog() -eq 'OK'){ $tb.Value.Text=$dlg.FileName } }
+function Browse-AnyFile([ref]$tb, [string]$initialDir){
+  $dlg = New-Object System.Windows.Forms.OpenFileDialog
+  $dlg.Filter='All files (*.*)|*.*'
+  if($initialDir -and (Test-Path $initialDir)) { $dlg.InitialDirectory = $initialDir }
+  if($dlg.ShowDialog() -eq 'OK'){ $tb.Value.Text=$dlg.FileName; return (Split-Path -Parent $dlg.FileName) }
+  return $null
+}
 function Browse-Folder([ref]$tb){ $dlg = New-Object System.Windows.Forms.FolderBrowserDialog; if($dlg.ShowDialog() -eq 'OK'){ $tb.Value.Text=$dlg.SelectedPath } }
 
-$btnRefPdd.Add_Click({ Browse-AnyFile ([ref]$tbRefPdd) })
-$btnEvalPdd.Add_Click({ Browse-AnyFile ([ref]$tbEvalPdd) })
-$btnRefOcr.Add_Click({ Browse-AnyFile ([ref]$tbRefOcr) })
-$btnEvalOcr.Add_Click({ Browse-AnyFile ([ref]$tbEvalOcr) })
+$script:lastRefPddDir  = if($cfg.last_ref_pdd_dir){ [string]$cfg.last_ref_pdd_dir } else { '' }
+$script:lastEvalPddDir = if($cfg.last_eval_pdd_dir){ [string]$cfg.last_eval_pdd_dir } else { '' }
+$script:lastRefOcrDir  = if($cfg.last_ref_ocr_dir){ [string]$cfg.last_ref_ocr_dir } else { '' }
+$script:lastEvalOcrDir = if($cfg.last_eval_ocr_dir){ [string]$cfg.last_eval_ocr_dir } else { '' }
+
+$btnRefPdd.Add_Click({ $d = Browse-AnyFile ([ref]$tbRefPdd) $script:lastRefPddDir; if($d){ $script:lastRefPddDir = $d } })
+$btnEvalPdd.Add_Click({ $d = Browse-AnyFile ([ref]$tbEvalPdd) $script:lastEvalPddDir; if($d){ $script:lastEvalPddDir = $d } })
+$btnRefOcr.Add_Click({ $d = Browse-AnyFile ([ref]$tbRefOcr) $script:lastRefOcrDir; if($d){ $script:lastRefOcrDir = $d } })
+$btnEvalOcr.Add_Click({ $d = Browse-AnyFile ([ref]$tbEvalOcr) $script:lastEvalOcrDir; if($d){ $script:lastEvalOcrDir = $d } })
 $btnOut.Add_Click({ Browse-Folder ([ref]$tbOut) })
 $btnOpen.Add_Click({ if([string]::IsNullOrWhiteSpace($tbOut.Text)){return}else{ Start-Process explorer.exe $tbOut.Text } })
 
@@ -130,19 +141,6 @@ function Build-Command(){
   if([string]::IsNullOrWhiteSpace($tbRefPdd.Text) -or [string]::IsNullOrWhiteSpace($tbEvalPdd.Text) -or [string]::IsNullOrWhiteSpace($tbRefOcr.Text) -or [string]::IsNullOrWhiteSpace($tbEvalOcr.Text) -or [string]::IsNullOrWhiteSpace($tbOut.Text)){
     [System.Windows.Forms.MessageBox]::Show('Please select all required files and output folder.'); return $null }
   New-Item -ItemType Directory -Force -Path $tbOut.Text | Out-Null
-  # Update config.ini output_dir so CLI writes under selected folder
-  try {
-    $cfgPathIni = Join-Path $ROOT 'config.ini'
-    $lines = @()
-    $lines += '[Paths]'
-    $lines += ('phits_data_dir = ' + (Split-Path -Parent $tbEvalPdd.Text))
-    $lines += ('measured_data_dir = ' + (Join-Path $ROOT 'data/measured_csv'))
-    $lines += ('output_dir = ' + $tbOut.Text)
-    $lines += ''
-    $lines += '[Processing]'
-    $lines += ('resample_grid_cm = ' + [string]$numGrid.Value)
-    ($lines -join "`r`n") | Out-File -FilePath $cfgPathIni -Encoding utf8
-  } catch {}
   $cmd = @('python','-u','src/ocr_true_scaling.py',
     '--ref-pdd-type',$cbRefPdd.SelectedItem,'--ref-pdd-file',$tbRefPdd.Text,
     '--eval-pdd-type',$cbEvalPdd.SelectedItem,'--eval-pdd-file',$tbEvalPdd.Text,
@@ -153,7 +151,7 @@ function Build-Command(){
     '--dd2',[string]$numDD2.Value,'--dta2',[string]$numDTA2.Value,
     '--cutoff',[string]$numCut.Value,'--grid',[string]$numGrid.Value,
     '--smooth-window',[string]$numWin.Value,'--smooth-order',[string]$numOrd.Value,
-    '--center-tol-cm',[string]$numCTol.Value,'--fwhm-warn-cm',[string].Value,'--output-dir',.Text)
+    '--center-tol-cm',[string].Value,'--fwhm-warn-cm',[string].Value,'--output-dir',.Text)
   if ($cbNorm.SelectedItem -eq 'z_ref') { $cmd += @('--z-ref',[string]$numZref.Value) }
   if ($cbNoSmooth.Checked) { $cmd += '--no-smooth' }
   if ($cbCInterp.Checked) { $cmd += '--center-interp' }
@@ -242,6 +240,10 @@ $btnSave.Add_Click({
     export_gamma = [bool]$cbGAM.Checked
     legend_ref = [string]$tbLRef.Text
     legend_eval = [string]$tbLEval.Text
+    last_ref_pdd_dir  = [string]$script:lastRefPddDir
+    last_eval_pdd_dir = [string]$script:lastEvalPddDir
+    last_ref_ocr_dir  = [string]$script:lastRefOcrDir
+    last_eval_ocr_dir = [string]$script:lastEvalOcrDir
   }
   try { ($new | ConvertTo-Json -Depth 3) | Out-File -FilePath $cfgPath -Encoding utf8; [System.Windows.Forms.MessageBox]::Show('Saved.') } catch {}
 })
@@ -256,4 +258,5 @@ $cbNorm.add_SelectedIndexChanged({
 if ([string]$cbNorm.SelectedItem -eq 'z_ref') { $numZref.Enabled = $true } else { $numZref.Enabled = $false }
 
 [void]$form.ShowDialog()
+
 
