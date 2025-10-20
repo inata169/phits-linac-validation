@@ -222,6 +222,16 @@ function Run-Cmd([string[]]$cmd){
         if (-not [string]::IsNullOrWhiteSpace($tbOut.Text)) {
           $logPath = Join-Path $tbOut.Text 'log.txt'
           $tbLog.Text | Out-File -FilePath $logPath -Encoding utf8
+          # Try to append last report depths
+          $repDir = Join-Path $tbOut.Text 'reports'
+          if (Test-Path $repDir) {
+            $last = Get-ChildItem -Path $repDir -Filter '*.txt' -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+            if ($last) {
+              $content = Get-Content -Path $last.FullName -ErrorAction SilentlyContinue
+              $line = ($content | Where-Object { $_ -match '^ref depth \(cm\).*' } | Select-Object -First 1)
+              if ($line) { $tbLog.AppendText("[Depths] " + $line + "`r`n") }
+            }
+          }
         }
       } catch {}
     })
