@@ -85,3 +85,11 @@
 - レガシー: `src/Comp_measured_phits_v9_1_legacy.py`, ラッパー: `src/Comp_measured_phits_v9.1.py`
 - 設定: `config.ini`
 - サンプル: `data/measured_csv/`, `data/phits_output/`
+
+
+-----
+
+### 追加オプション（中心正規化の調整）
+- --center-tol-cm <cm>: x=0 近傍と見なす許容範囲（既定 0.05 cm）。原点近傍サンプルが粗い場合のロバスト化に有効。
+- --center-interp: x=0 にサンプルが無い場合に線形補間で x=0 の値を推定し、中心正規化の基準に使用（無指定時は最大値代用）。
+
