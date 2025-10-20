@@ -178,6 +178,37 @@ def ocr_center_normalize(pos_cm: np.ndarray, dose_norm: np.ndarray, tol_cm: floa
     return pos_centered, (dose_norm / c)
 
 
+def ocr_center_normalize_with_options(pos_cm: np.ndarray, dose_norm: np.ndarray,
+                                      tol_cm: float = 0.05, interp: bool = False) -> Tuple[np.ndarray, np.ndarray]:
+    """中心位置合わせと振幅の中心正規化（補間オプション付き）。
+    - 位置: 中心に最も近いサンプルの座標を原点へ平行移動
+    - 振幅: x=0 の値を基準に 1.00 へスケーリング（x=0 サンプルが tol 以内に無い場合、interp 指定時は線形補間を試みる。不可なら最大値で代用）
+    """
+    if pos_cm.size == 0:
+        return pos_cm, dose_norm
+    idx_center = int(np.argmin(np.abs(pos_cm)))
+    x_center = float(pos_cm[idx_center])
+    pos_centered = pos_cm - x_center
+    if abs(x_center) <= float(tol_cm):
+        c = float(dose_norm[idx_center])
+    else:
+        c = None
+        if interp and pos_cm.size >= 2:
+            for i in range(1, len(pos_cm)):
+                x0, x1 = float(pos_cm[i - 1]), float(pos_cm[i])
+                y0, y1 = float(dose_norm[i - 1]), float(dose_norm[i])
+                if (x0 <= 0.0 <= x1) or (x1 <= 0.0 <= x0):
+                    if x1 != x0:
+                        c = float(y0 + (0.0 - x0) * (y1 - y0) / (x1 - x0))
+                    else:
+                        c = float(y0)
+                    break
+        if c is None:
+            c = float(np.max(dose_norm)) if dose_norm.size else 1.0
+    if c <= 0:
+        raise ValueError("OCR中心正規化の基準が0以下です")
+    return pos_centered, (dose_norm / c)
+
 def resample_common_grid(x1: np.ndarray, y1: np.ndarray, x2: np.ndarray, y2: np.ndarray, step_cm: Optional[float]) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     if not step_cm or step_cm <= 0:
         return None, None, None
@@ -255,6 +286,8 @@ def main():
     parser.add_argument('--xlim-symmetric', action='store_true', help='横軸を原点対称範囲に設定する')
     parser.add_argument('--legend-ref', type=str, default=None, help='凡例のrefラベルを指定')
     parser.add_argument('--legend-eval', type=str, default=None, help='凡例のevalラベルを指定')
+    parser.add_argument('--center-tol-cm', type=float, default=0.05, help='中心正規化でx=0近傍と見なす許容範囲[cm]（既定0.05）')
+    parser.add_argument('--center-interp', action='store_true', help='x=0にサンプルが無い場合、線形補間でx=0の値を推定して中心正規化に使用する')
     parser.add_argument('--fwhm-warn-cm', type=float, default=1.0, help='|ΔFWHM|がこの閾値[cm]を超えた場合に警告を出力（OCR相対プロファイルから算出）')
     args = parser.parse_args()
 
@@ -316,7 +349,7 @@ def main():
                 z_depth_ref = args.z_ref
                 print(f"警告: OCR(PHITS) の深さをyスラブ/ファイル名から取得できませんでした。z_ref={args.z_ref} cm を使用します", file=sys.stderr)
         x_ref, ocr_ref = pos, dose
-    x_ref, ocr_ref_rel = ocr_center_normalize(x_ref, ocr_ref, tol_cm=0.05)
+    x_ref, ocr_ref_rel = ocr_center_normalize_with_options(x_ref, ocr_ref, tol_cm=args.center_tol_cm, interp=args.center_interp)
 
     # OCR 読み込み・中心正規化（eval）
     if args.eval_ocr_type == 'csv':
@@ -338,7 +371,7 @@ def main():
                 z_depth_eval = args.z_ref
                 print(f"警告: OCR(PHITS) の深さをyスラブ/ファイル名から取得できませんでした。z_ref={args.z_ref} cm を使用します", file=sys.stderr)
         x_eval, ocr_eval = pos, dose
-    x_eval, ocr_eval_rel = ocr_center_normalize(x_eval, ocr_eval, tol_cm=0.05)
+    x_eval, ocr_eval_rel = ocr_center_normalize_with_options(x_eval, ocr_eval, tol_cm=args.center_tol_cm, interp=args.center_interp)
 
     # 軽い平滑化（Savitzky–Golay）。データ点数が不足/条件不一致ならスキップ
     if not args.no_smooth:
