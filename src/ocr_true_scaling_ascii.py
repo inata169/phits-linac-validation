@@ -99,6 +99,17 @@ def parse_phits_out_profile(path: str) -> Tuple[str, np.ndarray, np.ndarray, dic
         meta["y_center_cm"] = y_center
     return axis or "", pos, (dose / dmax), meta
 
+def _extract_depth_cm_from_phits_filename(path: str) -> Optional[float]:
+    try:
+        base = os.path.basename(path)
+        # match ...-200z.out or ...-200x.out or ...-200.out
+        m = re.search(r"-(\d+)([a-z])?\.out$", base, flags=re.IGNORECASE)
+        if not m:
+            return None
+        mm = float(m.group(1))
+        return mm / 10.0
+    except Exception:
+        return None
 
 def normalize_pdd(pos_cm: np.ndarray, dose_norm: np.ndarray, mode: str, z_ref_cm: float):
     if mode == "z_ref":
@@ -203,7 +214,16 @@ def main():
         z_depth_ref = float(m.group(1)) if m else args.z_ref
     else:
         axis, pos, dose, meta = parse_phits_out_profile(args.ref_ocr_file)
-        z_depth_ref = meta.get('y_center_cm', args.z_ref)
+        z_depth_ref = meta.get('y_center_cm', None)
+        if z_depth_ref is None:
+            z_depth_ref = _extract_depth_cm_from_phits_filename(args.ref_ocr_file)
+        if z_depth_ref is None:
+            # fallback
+            z_depth_ref = args.z_ref
+            try:
+                print(f"警告: PHITS OCR(ref) の深さをヘッダ/ファイル名から取得できず z_ref={args.z_ref} cm を使用", file=sys.stderr)
+            except Exception:
+                pass
         x_ref, ocr_ref = pos, dose
     x_ref, ocr_ref_rel = center_normalise(x_ref, ocr_ref, tol_cm=args.center_tol_cm, interp=args.center_interp)
 
@@ -213,7 +233,16 @@ def main():
         z_depth_eval = float(m.group(1)) if m else args.z_ref
     else:
         axis, pos, dose, meta = parse_phits_out_profile(args.eval_ocr_file)
-        z_depth_eval = meta.get('y_center_cm', args.z_ref)
+        z_depth_eval = meta.get('y_center_cm', None)
+        if z_depth_eval is None:
+            z_depth_eval = _extract_depth_cm_from_phits_filename(args.eval_ocr_file)
+        if z_depth_eval is None:
+            # fallback
+            z_depth_eval = args.z_ref
+            try:
+                print(f"警告: PHITS OCR(eval) の深さをヘッダ/ファイル名から取得できず z_ref={args.z_ref} cm を使用", file=sys.stderr)
+            except Exception:
+                pass
         x_eval, ocr_eval = pos, dose
     x_eval, ocr_eval_rel = center_normalise(x_eval, ocr_eval, tol_cm=args.center_tol_cm, interp=args.center_interp)
 
@@ -408,4 +437,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-

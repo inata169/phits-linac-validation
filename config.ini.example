@@ -1,0 +1,8 @@
+[Paths]
+phits_data_dir = C:\\path\\to\\phits_outputs
+measured_data_dir = C:\\path\\to\\measured_csv
+output_dir = .\\output
+
+[Processing]
+resample_grid_cm = 0.1
+
