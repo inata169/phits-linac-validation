@@ -108,10 +108,11 @@ $form.Controls.Add((New-Label 'Legend eval' 420 276)); $tbLEval = New-Object Sys
 
 # Run / Open / Log
 $btnRun = New-Button 'Run' 20 310 120 32
-$btnOpen = New-Button 'Open Output' 160 310 160 32
-$lblStatus = New-Label 'Status: Idle' 340 316
+$btnPrev = New-Button 'Preview Depths' 150 310 150 32
+$btnOpen = New-Button 'Open Output' 310 310 160 32
+$lblStatus = New-Label 'Status: Idle' 480 316
 $pb = New-Object System.Windows.Forms.ProgressBar; $pb.Location=New-Object System.Drawing.Point(20, 348); $pb.Size=New-Object System.Drawing.Size(800, 10); $pb.Style='Marquee'; $pb.MarqueeAnimationSpeed=25; $pb.Visible=$false
-$form.Controls.Add($btnRun); $form.Controls.Add($btnOpen); $form.Controls.Add($lblStatus); $form.Controls.Add($pb)
+$form.Controls.Add($btnRun); $form.Controls.Add($btnPrev); $form.Controls.Add($btnOpen); $form.Controls.Add($lblStatus); $form.Controls.Add($pb)
 
 $tbLog = New-Object System.Windows.Forms.TextBox; $tbLog.Location=New-Object System.Drawing.Point(20,368); $tbLog.Size=New-Object System.Drawing.Size(800,260); $tbLog.Multiline=$true; $tbLog.ScrollBars='Vertical'; $tbLog.ReadOnly=$true; $form.Controls.Add($tbLog)
 
@@ -136,6 +137,42 @@ $btnRefOcr.Add_Click({ $d = Browse-AnyFile ([ref]$tbRefOcr) $script:lastRefOcrDi
 $btnEvalOcr.Add_Click({ $d = Browse-AnyFile ([ref]$tbEvalOcr) $script:lastEvalOcrDir; if($d){ $script:lastEvalOcrDir = $d } })
 $btnOut.Add_Click({ Browse-Folder ([ref]$tbOut) })
 $btnOpen.Add_Click({ if([string]::IsNullOrWhiteSpace($tbOut.Text)){return}else{ Start-Process explorer.exe $tbOut.Text } })
+$btnPrev.Add_Click({ Preview-Depths })
+
+# Depth preview helpers
+function Get-DepthFromCsvPath([string]$p){
+  try {
+    $name = [System.IO.Path]::GetFileName($p)
+    $m = [regex]::Match($name, '([0-9]+(?:\.[0-9]+)?)\s*cm', 'IgnoreCase')
+    if ($m.Success) { return [double]$m.Groups[1].Value }
+  } catch {}
+  return $null
+}
+function Get-DepthFromPhitsPath([string]$p){
+  try {
+    $name = [System.IO.Path]::GetFileName($p)
+    $m = [regex]::Match($name, '-(\d+)([a-z])?\.out$', 'IgnoreCase')
+    if ($m.Success) { return ([double]$m.Groups[1].Value) / 10.0 }
+  } catch {}
+  return $null
+}
+function Preview-Depths(){
+  $refType = [string]$cbRefOcr.SelectedItem
+  $evalType = [string]$cbEvalOcr.SelectedItem
+  $refPath = [string]$tbRefOcr.Text
+  $evalPath = [string]$tbEvalOcr.Text
+  if ([string]::IsNullOrWhiteSpace($refPath) -or [string]::IsNullOrWhiteSpace($evalPath)){
+    [System.Windows.Forms.MessageBox]::Show('Please select both Ref/Eval OCR files first.')
+    return
+  }
+  $zr = $null; $ze = $null
+  if ($refType -eq 'csv') { $zr = Get-DepthFromCsvPath $refPath } else { $zr = Get-DepthFromPhitsPath $refPath }
+  if ($evalType -eq 'csv') { $ze = Get-DepthFromCsvPath $evalPath } else { $ze = Get-DepthFromPhitsPath $evalPath }
+  $msg = "Ref depth: " + ([string]::Format('{0}', $(if($zr -ne $null){ '{0:0.###} cm' -f $zr } else { 'N/A' }))) +
+         "  |  Eval depth: " + ([string]::Format('{0}', $(if($ze -ne $null){ '{0:0.###} cm' -f $ze } else { 'N/A' }))) +
+         "`r`n(Depth is estimated from filenames. Final value may use PHITS header y-slab if available.)"
+  [System.Windows.Forms.MessageBox]::Show($msg, 'Depth Preview') | Out-Null
+}
 
 function Build-Command(){
   if([string]::IsNullOrWhiteSpace($tbRefPdd.Text) -or [string]::IsNullOrWhiteSpace($tbEvalPdd.Text) -or [string]::IsNullOrWhiteSpace($tbRefOcr.Text) -or [string]::IsNullOrWhiteSpace($tbEvalOcr.Text) -or [string]::IsNullOrWhiteSpace($tbOut.Text)){
