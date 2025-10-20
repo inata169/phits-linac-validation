@@ -130,6 +130,19 @@ function Build-Command(){
   if([string]::IsNullOrWhiteSpace($tbRefPdd.Text) -or [string]::IsNullOrWhiteSpace($tbEvalPdd.Text) -or [string]::IsNullOrWhiteSpace($tbRefOcr.Text) -or [string]::IsNullOrWhiteSpace($tbEvalOcr.Text) -or [string]::IsNullOrWhiteSpace($tbOut.Text)){
     [System.Windows.Forms.MessageBox]::Show('Please select all required files and output folder.'); return $null }
   New-Item -ItemType Directory -Force -Path $tbOut.Text | Out-Null
+  # Update config.ini output_dir so CLI writes under selected folder
+  try {
+    $cfgPathIni = Join-Path $ROOT 'config.ini'
+    $lines = @()
+    $lines += '[Paths]'
+    $lines += ('phits_data_dir = ' + (Split-Path -Parent $tbEvalPdd.Text))
+    $lines += ('measured_data_dir = ' + (Join-Path $ROOT 'data/measured_csv'))
+    $lines += ('output_dir = ' + $tbOut.Text)
+    $lines += ''
+    $lines += '[Processing]'
+    $lines += ('resample_grid_cm = ' + [string]$numGrid.Value)
+    ($lines -join "`r`n") | Out-File -FilePath $cfgPathIni -Encoding utf8
+  } catch {}
   $cmd = @('python','-u','src/ocr_true_scaling.py',
     '--ref-pdd-type',$cbRefPdd.SelectedItem,'--ref-pdd-file',$tbRefPdd.Text,
     '--eval-pdd-type',$cbEvalPdd.SelectedItem,'--eval-pdd-file',$tbEvalPdd.Text,
@@ -167,7 +180,15 @@ function Run-Cmd([string[]]$cmd){
   $p.SynchronizingObject = $form
   $null = $p.add_OutputDataReceived({ param($s,$e) if ($e.Data){ $tbLog.AppendText($e.Data+"`r`n") } })
   $null = $p.add_ErrorDataReceived({ param($s,$e) if ($e.Data){ $tbLog.AppendText($e.Data+"`r`n") } })
-  $null = $p.add_Exited({ param($s,$e) $btnRun.Enabled=$true; $btnRun.Text='Run'; $lblStatus.Text = ("Status: Done (Exit {0})" -f $s.ExitCode); $pb.Visible=$false })
+  $null = $p.add_Exited({ param($s,$e)
+      $btnRun.Enabled=$true; $btnRun.Text='Run'; $lblStatus.Text = ("Status: Done (Exit {0})" -f $s.ExitCode); $pb.Visible=$false
+      try {
+        if (-not [string]::IsNullOrWhiteSpace($tbOut.Text)) {
+          $logPath = Join-Path $tbOut.Text 'log.txt'
+          $tbLog.Text | Out-File -FilePath $logPath -Encoding utf8
+        }
+      } catch {}
+    })
   [void]$p.Start(); $p.BeginOutputReadLine(); $p.BeginErrorReadLine()
 }
 
@@ -227,4 +248,3 @@ $btnSave.Add_Click({
 $btnRun.Add_Click({ $cmd = Build-Command; if($null -ne $cmd){ Run-Cmd $cmd } })
 
 [void]$form.ShowDialog()
-
