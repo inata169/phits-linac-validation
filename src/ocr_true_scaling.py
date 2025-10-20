@@ -126,6 +126,24 @@ def parse_phits_out_profile(path: str) -> Tuple[str, np.ndarray, np.ndarray, dic
         meta['y_center_cm'] = y_slab
     return (axis or ''), pos, dose_norm, meta
 
+def _extract_depth_cm_from_csv_filename(filename: str) -> Optional[float]:
+    try:
+        m = re.search(r"([0-9]+(?:\.[0-9]+)?)\s*cm", os.path.basename(filename), re.IGNORECASE)
+        return float(m.group(1)) if m else None
+    except Exception:
+        return None
+
+def _extract_depth_cm_from_phits_filename(filename: str) -> Optional[float]:
+    try:
+        base = os.path.basename(filename)
+        m = re.search(r"-(\d+)([a-z])?\.out$", base, re.IGNORECASE)
+        if not m:
+            return None
+        mm = float(m.group(1))
+        return mm / 10.0
+    except Exception:
+        return None
+
 
 def normalize_pdd(pos_cm: np.ndarray, dose_norm: np.ndarray, mode: str, z_ref_cm: float) -> Tuple[np.ndarray, np.ndarray]:
     if mode == 'z_ref':
@@ -237,6 +255,7 @@ def main():
     parser.add_argument('--xlim-symmetric', action='store_true', help='横軸を原点対称範囲に設定する')
     parser.add_argument('--legend-ref', type=str, default=None, help='凡例のrefラベルを指定')
     parser.add_argument('--legend-eval', type=str, default=None, help='凡例のevalラベルを指定')
+    parser.add_argument('--fwhm-warn-cm', type=float, default=1.0, help='|ΔFWHM|がこの閾値[cm]を超えた場合に警告を出力（OCR相対プロファイルから算出）')
     args = parser.parse_args()
 
     # config から grid 既定値
@@ -279,23 +298,45 @@ def main():
     if args.ref_ocr_type == 'csv':
         x_ref, ocr_ref = load_csv_profile(args.ref_ocr_file)
         # 深さはファイル名から推定 (..10cm.. → 10.0)
-        m = re.search(r'([0-9]+)\s*cm', os.path.basename(args.ref_ocr_file), re.IGNORECASE)
-        z_depth_ref = float(m.group(1)) if m else args.z_ref
+        depth_csv = _extract_depth_cm_from_csv_filename(args.ref_ocr_file)
+        if depth_csv is not None:
+            z_depth_ref = float(depth_csv)
+        else:
+            z_depth_ref = args.z_ref
+            print(f"警告: OCR(CSV) の深さをファイル名から取得できませんでした。z_ref={args.z_ref} cm を使用します", file=sys.stderr)
     else:
         axis, pos, dose, meta = parse_phits_out_profile(args.ref_ocr_file)
         # PHITS OCR は lateral 軸 (xやz) のはず。深さは y_slab 中心を採用
-        z_depth_ref = meta.get('y_center_cm', args.z_ref)
+        z_depth_ref = meta.get('y_center_cm', None)
+        if z_depth_ref is None:
+            depth_from_name = _extract_depth_cm_from_phits_filename(args.ref_ocr_file)
+            if depth_from_name is not None:
+                z_depth_ref = float(depth_from_name)
+            else:
+                z_depth_ref = args.z_ref
+                print(f"警告: OCR(PHITS) の深さをyスラブ/ファイル名から取得できませんでした。z_ref={args.z_ref} cm を使用します", file=sys.stderr)
         x_ref, ocr_ref = pos, dose
     x_ref, ocr_ref_rel = ocr_center_normalize(x_ref, ocr_ref, tol_cm=0.05)
 
     # OCR 読み込み・中心正規化（eval）
     if args.eval_ocr_type == 'csv':
         x_eval, ocr_eval = load_csv_profile(args.eval_ocr_file)
-        m = re.search(r'([0-9]+)\s*cm', os.path.basename(args.eval_ocr_file), re.IGNORECASE)
-        z_depth_eval = float(m.group(1)) if m else args.z_ref
+        depth_csv = _extract_depth_cm_from_csv_filename(args.eval_ocr_file)
+        if depth_csv is not None:
+            z_depth_eval = float(depth_csv)
+        else:
+            z_depth_eval = args.z_ref
+            print(f"警告: OCR(CSV) の深さをファイル名から取得できませんでした。z_ref={args.z_ref} cm を使用します", file=sys.stderr)
     else:
         axis, pos, dose, meta = parse_phits_out_profile(args.eval_ocr_file)
-        z_depth_eval = meta.get('y_center_cm', args.z_ref)
+        z_depth_eval = meta.get('y_center_cm', None)
+        if z_depth_eval is None:
+            depth_from_name = _extract_depth_cm_from_phits_filename(args.eval_ocr_file)
+            if depth_from_name is not None:
+                z_depth_eval = float(depth_from_name)
+            else:
+                z_depth_eval = args.z_ref
+                print(f"警告: OCR(PHITS) の深さをyスラブ/ファイル名から取得できませんでした。z_ref={args.z_ref} cm を使用します", file=sys.stderr)
         x_eval, ocr_eval = pos, dose
     x_eval, ocr_eval_rel = ocr_center_normalize(x_eval, ocr_eval, tol_cm=0.05)
 
@@ -321,6 +362,45 @@ def main():
     # True(x,z) 構築
     s_axis_ref = float(np.interp(z_depth_ref, z_ref_pos, z_ref_norm))
     s_axis_eval = float(np.interp(z_depth_eval, z_eval_pos, z_eval_norm))
+    # FWHM（相対OCRで計算）
+    def _compute_fwhm(pos_cm: np.ndarray, dose_norm: np.ndarray) -> Optional[float]:
+        if pos_cm.size < 3 or dose_norm.size < 3:
+            return None
+        imax = int(np.argmax(dose_norm))
+        peak = float(dose_norm[imax])
+        if peak <= 0:
+            return None
+        half = peak * 0.5
+        left = None
+        for i in range(imax, 0, -1):
+            y0, y1 = dose_norm[i - 1], dose_norm[i]
+            if (y0 <= half <= y1) or (y1 <= half <= y0):
+                x0, x1 = pos_cm[i - 1], pos_cm[i]
+                left = float(x0) if (y1 == y0) else float(x0 + (half - y0) * (x1 - x0) / (y1 - y0))
+                break
+        right = None
+        for i in range(imax, len(pos_cm) - 1):
+            y0, y1 = dose_norm[i], dose_norm[i + 1]
+            if (y0 <= half <= y1) or (y1 <= half <= y0):
+                x0, x1 = pos_cm[i], pos_cm[i + 1]
+                right = float(x1) if (y1 == y0) else float(x0 + (half - y0) * (x1 - x0) / (y1 - y0))
+                break
+        if left is None or right is None:
+            return None
+        return float(abs(right - left))
+
+    fwhm_ref = _compute_fwhm(x_ref, ocr_ref_rel)
+    fwhm_eval = _compute_fwhm(x_eval, ocr_eval_rel)
+    fwhm_delta = None
+    if fwhm_ref is not None and fwhm_eval is not None:
+        fwhm_delta = fwhm_eval - fwhm_ref
+        try:
+            thr = float(args.fwhm_warn_cm)
+        except Exception:
+            thr = 1.0
+        if abs(fwhm_delta) > thr:
+            print(f"警告: FWHMミスマッチ |Δ|={abs(fwhm_delta):.3f} cm (> {thr:.3f} cm). ref={fwhm_ref:.3f} cm, eval={fwhm_eval:.3f} cm", file=sys.stderr)
+
     y_true_ref = s_axis_ref * ocr_ref_rel
     y_true_eval = s_axis_eval * ocr_eval_rel
 
@@ -449,6 +529,11 @@ def main():
             f.write(f"ref depth (cm): {z_depth_ref:.6f}, eval depth (cm): {z_depth_eval:.6f}\n")
             f.write(f"S_axis(ref): {s_axis_ref:.6f}, S_axis(eval): {s_axis_eval:.6f}\n")
             f.write(f"grid (cm): {grid_step:.6f}\n")
+            try:
+                if fwhm_ref is not None and fwhm_eval is not None:
+                    f.write(f"FWHM(ref/eval) [cm]: {fwhm_ref:.4f} / {fwhm_eval:.4f} (Δ={fwhm_delta:+.4f})\n")
+            except Exception:
+                pass
             f.write("\n## 結果\n")
             f.write(f"RMSE: {rmse:.6f}\n")
             f.write(f"Gamma 1 (DD={args.dd1:.1f}%, DTA={args.dta1:.1f}mm, Cutoff={args.cutoff:.1f}%): {g1:.2f}%\n")
