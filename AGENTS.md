@@ -31,6 +31,24 @@
 - 例（reference=CSV, eval=PHITS, 深さ10 cm）:
   - `python src/ocr_true_scaling.py --ref-pdd-type csv --ref-pdd-file data/measured_csv/10x10mPDD-zZver.csv --eval-pdd-type phits --eval-pdd-file data/phits_output/deposit-z-water.out --ref-ocr-type csv --ref-ocr-file data/measured_csv/10x10m10cm-xXlat.csv --eval-ocr-type phits --eval-ocr-file data/phits_output/I600/deposit-y-water-100.out --norm-mode dmax --cutoff 10 --export-csv --export-gamma`
 
+### トラブルシューティング: 深さ20 cm などでGPRが低い
+- 前提整合の確認（必須）
+  - 深さ: レポートの `ref depth / eval depth` と `S_axis(ref/eval)` が一致していること。
+  - 幅: FWHM(ref/eval) が許容差（目安: 5×5=±0.5 cm、10×10=±1.0 cm、30×30=±2.0 cm）内。
+- 中心正規化
+  - x=0 ±0.05 cm にサンプルが無いと最大値正規化へフォールバックし、肩形状が歪むことがある。
+  - 目視と最小 |x| の確認（原点近傍サンプルが十分か）。
+- 平滑化の感度
+  - `--no-smooth`／`--smooth-window 11 --smooth-order 3` などで挙動比較。深部は軽めの平滑が無難なことが多い。
+- カットオフの感度
+  - `--cutoff 20` で尾部ノイズの影響を抑えて改善するかを確認。
+- ガンマ基準の感度
+  - 診断用に `--dd1 3 --dta1 3` で改善度合いを確認（分解能/幾何差の影響切り分け）。
+- 軸対応ミスの排除
+  - `xXlat` ↔ `...x.out`、`zYlng` ↔ `...z.out` を厳密に合わせる。
+- 共通グリッド
+  - `--grid 0.1` はRMSE/可視化安定化に有用（γは元軸で評価）。
+
 ### レガシー（互換）
 - `src/Comp_measured_phits_v9.1.py` はラッパーで、実体は `src/Comp_measured_phits_v9_1_legacy.py` にあります。
 
