@@ -286,6 +286,7 @@ def main():
     parser.add_argument('--center-tol-cm', type=float, default=0.05, help='荳ｭ蠢・ｭ｣隕丞喧縺ｧx=0霑大ｍ縺ｨ隕九↑縺呵ｨｱ螳ｹ遽・峇[cm]・域里螳・.05・・)
     parser.add_argument('--center-interp', action='store_true', help='x=0縺ｫ繧ｵ繝ｳ繝励Ν縺檎┌縺・ｴ蜷医∫ｷ壼ｽ｢陬憺俣縺ｧx=0縺ｮ蛟､繧呈耳螳壹＠縺ｦ荳ｭ蠢・ｭ｣隕丞喧縺ｫ菴ｿ逕ｨ縺吶ｋ')
     parser.add_argument('--fwhm-warn-cm', type=float, default=1.0, help='|ΔFWHM|がこの閾値[cm]を超えた場合に警告を出力（OCR相対プロファイルから算出）')
+    parser.add_argument('--output-dir', type=str, default=None, help='出力ルート（plots/reports/data配下を生成）。config.iniより優先')
 
     # OCR 隱ｭ縺ｿ霎ｼ縺ｿ繝ｻ荳ｭ蠢・ｭ｣隕丞喧・・val・・
     if args.eval_ocr_type == 'csv':
