@@ -23,7 +23,11 @@ except ModuleNotFoundError as e:
 
 
 def load_csv_profile(path: str) -> Tuple[np.ndarray, np.ndarray]:
-    df0 = pd.read_csv(path, encoding="utf-8-sig", header=None)
+    # Try CSV; if fails, retry as whitespace-delimited
+    try:
+        df0 = pd.read_csv(path, encoding="utf-8-sig", header=None)
+    except Exception:
+        df0 = pd.read_csv(path, encoding="utf-8-sig", header=None, delim_whitespace=True)
     if df0.shape[1] >= 2 and isinstance(df0.iloc[0, 0], str) and "(cm)" in str(df0.iloc[0, 0]):
         df = pd.read_csv(path, encoding="utf-8-sig")
         cols = list(df.columns)[:2]
@@ -194,21 +198,42 @@ def main():
     ap.add_argument('--output-dir', type=str, default=None)
     args = ap.parse_args()
 
-    # PDD load & normalise
-    if args.ref_pdd_type == 'csv':
+    # PDD load & normalise (auto-correct types for convenience)
+    ref_pdd_type = args.ref_pdd_type
+    if ref_pdd_type == 'csv' and os.path.basename(args.ref_pdd_file).lower().endswith('.out'):
+        print(f"警告: ref PDD が .out のため CSV→PHITS に自動切替: {args.ref_pdd_file}", file=sys.stderr)
+        ref_pdd_type = 'phits'
+    if ref_pdd_type == 'csv':
         z_ref_pos, z_ref_dose = load_csv_profile(args.ref_pdd_file)
     else:
         _, z_ref_pos, z_ref_dose, _ = parse_phits_out_profile(args.ref_pdd_file)
     z_ref_pos, z_ref_norm = normalize_pdd(z_ref_pos, z_ref_dose, args.norm_mode, args.z_ref)
 
-    if args.eval_pdd_type == 'csv':
+    eval_pdd_type = args.eval_pdd_type
+    if eval_pdd_type == 'csv' and os.path.basename(args.eval_pdd_file).lower().endswith('.out'):
+        print(f"警告: eval PDD が .out のため CSV→PHITS に自動切替: {args.eval_pdd_file}", file=sys.stderr)
+        eval_pdd_type = 'phits'
+    if eval_pdd_type == 'csv':
         z_eval_pos, z_eval_dose = load_csv_profile(args.eval_pdd_file)
     else:
         _, z_eval_pos, z_eval_dose, _ = parse_phits_out_profile(args.eval_pdd_file)
     z_eval_pos, z_eval_norm = normalize_pdd(z_eval_pos, z_eval_dose, args.norm_mode, args.z_ref)
 
     # OCR load & center-normalise
-    if args.ref_ocr_type == 'csv':
+    # Auto-correct common mistake: PHITS .out selected with csv type
+    def _guess_type(p: str) -> str:
+        b = os.path.basename(p).lower()
+        if b.endswith('.out') or b.endswith('.eps'):
+            return 'phits'
+        if b.endswith('.csv'):
+            return 'csv'
+        return 'csv'
+
+    ref_ocr_type = args.ref_ocr_type
+    if ref_ocr_type == 'csv' and _guess_type(args.ref_ocr_file) == 'phits':
+        print(f"警告: ref OCR が .out のため CSV→PHITS に自動切替: {args.ref_ocr_file}", file=sys.stderr)
+        ref_ocr_type = 'phits'
+    if ref_ocr_type == 'csv':
         x_ref, ocr_ref = load_csv_profile(args.ref_ocr_file)
         m = re.search(r"([0-9]+)\s*cm", os.path.basename(args.ref_ocr_file), re.IGNORECASE)
         z_depth_ref = float(m.group(1)) if m else args.z_ref
@@ -227,7 +252,11 @@ def main():
         x_ref, ocr_ref = pos, dose
     x_ref, ocr_ref_rel = center_normalise(x_ref, ocr_ref, tol_cm=args.center_tol_cm, interp=args.center_interp)
 
-    if args.eval_ocr_type == 'csv':
+    eval_ocr_type = args.eval_ocr_type
+    if eval_ocr_type == 'csv' and _guess_type(args.eval_ocr_file) == 'phits':
+        print(f"警告: eval OCR が .out のため CSV→PHITS に自動切替: {args.eval_ocr_file}", file=sys.stderr)
+        eval_ocr_type = 'phits'
+    if eval_ocr_type == 'csv':
         x_eval, ocr_eval = load_csv_profile(args.eval_ocr_file)
         m = re.search(r"([0-9]+)\s*cm", os.path.basename(args.eval_ocr_file), re.IGNORECASE)
         z_depth_eval = float(m.group(1)) if m else args.z_ref
