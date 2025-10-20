@@ -73,3 +73,13 @@ python src/ocr_true_scaling.py \
 
 MIT ライセンス
 
+
+-----
+
+## 補足: 絶対比較とFWHMチェック
+
+- 絶対（真値）比較に寄せたい場合、eval 側 PDD は PHITS の `deposit-z-water.out` を指定してください（ref 側は測定PDD）。
+- OCR の照射野はPHITSのファイル名からは直接分からないため、FWHMで幅整合を確認するのが有効です。
+- CLIオプション `--fwhm-warn-cm <cm>` を用いると、実行時に相対OCRから推定した FWHM(ref/eval) の |Δ| が閾値を超えた場合に stderr へ警告を出します（既定 1.0 cm）。レポートにも FWHM(ref/eval) と Δ を追記します。
+- 事前に幅を数値確認したい場合は `scripts/compute_fwhm.py` を利用してください。
+- 参考Rev（経験則）: 5×5→`Rev80-5x5-...`（または `Rev60-5x5-...`）、10×10→`Rev70-c8-0.49n`、30×30→`Rev50-30x30--c8-0.49n`。

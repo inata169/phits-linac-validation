@@ -400,6 +400,20 @@ def main():
             thr = 1.0
         if abs(fwhm_delta) > thr:
             print(f"警告: FWHMミスマッチ |Δ|={abs(fwhm_delta):.3f} cm (> {thr:.3f} cm). ref={fwhm_ref:.3f} cm, eval={fwhm_eval:.3f} cm", file=sys.stderr)
+            # 照射野の候補Revをヒント表示（経験則）
+            try:
+                ref_name = os.path.basename(args.ref_ocr_file).lower()
+                hint = None
+                if '05x05m' in ref_name or '5x5' in ref_name:
+                    hint = '5x5 → Rev80-5x5-...（または Rev60-5x5-...）'
+                elif '10x10m' in ref_name or '10x10' in ref_name:
+                    hint = '10x10 → Rev70-c8-0.49n'
+                elif '30x30m' in ref_name or '30x30' in ref_name:
+                    hint = '30x30 → Rev50-30x30--c8-0.49n'
+                if hint:
+                    print(f"ヒント: 比較対象のPHITSデータの照射野が異なる可能性があります（{hint}）。", file=sys.stderr)
+            except Exception:
+                pass
 
     y_true_ref = s_axis_ref * ocr_ref_rel
     y_true_eval = s_axis_eval * ocr_eval_rel
