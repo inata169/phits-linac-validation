@@ -16,6 +16,16 @@
   - `pip install -U pip`
   - `pip install pandas numpy matplotlib scipy pymedphys`
 
+### 実務メモ: 絶対比較とFWHMチェック（重要）
+- 真値（絶対寄り）の比較を行う場合は、eval 側 PDD に PHITS の `deposit-z-water.out` を指定する（ref 側は測定PDD）。
+- PHITS OCR の照射野サイズはファイル名からは直接判別できないため、FWHMで幅整合を確認する。
+  - 推奨: CLI引数 `--fwhm-warn-cm <cm>`（既定 1.0）を用い、FWHM(ref/eval) の |Δ| が閾値を超えたら stderr 警告を有効化。レポートにも FWHM(ref/eval) と Δ を出力。
+  - 事前チェック: `scripts/compute_fwhm.py` で測定CSVとPHITS `.out` のFWHMを比較可能。
+- 参考Rev（経験則・フィールド合致の目安）
+  - 5×5 → `Rev80-5x5-...`（または `Rev60-5x5-...`）
+  - 10×10 → `Rev70-c8-0.49n`
+  - 30×30 → `Rev50-30x30--c8-0.49n`
+
 ### 新CLI（推奨）: PDD重み付け真値スケーリング
 - エントリ: `python src/ocr_true_scaling.py`
 - 例（reference=CSV, eval=PHITS, 深さ10 cm）:
@@ -57,4 +67,3 @@
 - レガシー: `src/Comp_measured_phits_v9_1_legacy.py`, ラッパー: `src/Comp_measured_phits_v9.1.py`
 - 設定: `config.ini`
 - サンプル: `data/measured_csv/`, `data/phits_output/`
-
