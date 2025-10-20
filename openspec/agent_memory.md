@@ -34,3 +34,37 @@
 - æ”¹è¡Œã¯å¯èƒ½ãªã‚‰CRLFï¼ˆWindowsï¼‰ã«åˆã‚ã›ã‚‹ã€‚
 - çµ¶å¯¾ãƒ‘ã‚¹ã®ç›´æ›¸ãã¯ã—ãªã„ã€‚è¨­å®šã¯ `config.ini` ã«é›†ç´„ã€‚
 
+# ì‹Æƒƒ‚i2025-10-20j
+
+## ¡“ú‚â‚Á‚½‚±‚Æi—v“_j
+- GUI ˆÀ’è‰»‚Æ—˜•Ö«Œüã
+  - Depth Preview ƒ{ƒ^ƒ“‚ð’Ç‰ÁiOCRƒtƒ@ƒCƒ‹–¼‚©‚ç[‚³„’èj
+  - ŽÀsŠ®—¹Žž‚ÉÅVƒŒƒ|[ƒg‚Ì depth s‚ðƒƒO‚Ö’Ç‹L
+  - ÅVƒŒƒ|[ƒg/ƒvƒƒbƒg‚ðŠJ‚­ƒ{ƒ^ƒ“‚ð’Ç‰Á
+- True-scaling CLI ‰ü‘PiASCII ”Åj
+  - PHITS OCR ‚Ì[‚³„’èiƒwƒbƒ_—DæA–³‚¯‚ê‚Îƒtƒ@ƒCƒ‹–¼ `...-200z.out` ¨ 20cmj
+  - ƒtƒ@ƒCƒ‹Ží•Ê‚ÌŽ©“®”»’èiŠg’£Žq‚Å `csv/phits` ‚ðŽ©“®Ø‘ÖAstderr ‚ÉŒxj
+  - CSV ƒ[ƒh‚ÌŒ˜˜S‰»iƒJƒ“ƒ}Ž¸”sŽž‚É‹ó”’‹æØ‚è‚ÅÄƒgƒ‰ƒCj
+- ƒ†[ƒeƒBƒŠƒeƒB
+  - FWHM ˆêŠ‡ƒc[ƒ‹ `scripts/fwhm_batch.py` ‚ð’Ç‰Á
+  - `scripts/compute_fwhm.py` ‚Ì•¶Žš‰»‚¯/•¶–@C³
+- ƒhƒLƒ…ƒƒ“ƒg/Ý’è
+  - README ‚ð³í‰»‚µAƒgƒ‰ƒuƒ‹ƒVƒ…[ƒg‚ð’Ç‹L
+  - `config.ini.example` ‚ð’Ç‰ÁA`.gitignore` ‚ðXVi`config.ini`/`data/phits_output/` ‚È‚Çj
+
+## Šù’m‚ÌŽc‰Û‘èi–¾“úˆÈ~j
+- GUI ‚ÌŽ©“®ƒ^ƒCƒvØ‘Ö
+  - ƒtƒ@ƒCƒ‹‘I‘ðŽž‚ÉŠg’£Žq‚Å `csv/phits` ‚ðŽ©“®‘I‘ðiŒ»Ý‚Í CLI ‘¤‚ÅŽ©“®•â³j
+- CLI ‚Ìˆê–{‰»
+  - `src/ocr_true_scaling.py`i”ñASCIIj‚Æ `src/ocr_true_scaling_ascii.py` ‚Ì‹@”\·‚ðŠm”F‚µAŽÀ‘Ì‚ðˆê–{‚É“‡iƒGƒ“ƒgƒŠ‚©‚ç—¼•ûŒÄ‚×‚é‘ÌÙ‚Å‚à‰Âj
+- ƒŒƒ|[ƒgWŒvƒc[ƒ‹
+  - `output/reports/*.txt` ‚©‚ç RMSE/ƒÁ ‚ðŽûW‚µ‚Ä CSV ‚É‚Ü‚Æ‚ß‚éƒXƒNƒŠƒvƒg‚ð’Ç‰Á
+- ƒfƒ‚ƒm[ƒgƒuƒbƒN
+  - `notebooks/ocr_true_scaling_demo.ipynb` ‚ðì¬i“Ç‚Ýž‚Ý¨^’lƒXƒP[ƒŠƒ“ƒO¨RMSE/ƒÁ¨•Û‘¶‚ÌÅ¬—áj
+- •¶Žš‰»‚¯ƒXƒLƒƒƒ“
+  - Šù‘¶ƒ\[ƒX/README ‚Å‚Ì•¶Žš‰»‚¯‚ÌŽc‘¶‰ÓŠ‚ª–³‚¢‚©Œy‚­Šm”F
+
+## “®ìŠm”F‚Ìƒqƒ“ƒg
+- 5~5 ‚Å‚Ì GPR ’á‰ºŽž‚Í Depthi5/5ˆê’vj‚Æ FWHM ·A`--cutoff`/•½ŠŠ‰»/ƒOƒŠƒbƒh‚ð’²®
+- GUI ‚ÌƒƒO––”ö‚É `[Depths]` s‚ª•t‰Á‚³‚ê‚é‚Ì‚ÅA•sˆê’vŽž‚Í‚±‚±‚ðŽè‚ª‚©‚è‚É
+
