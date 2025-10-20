@@ -1,4 +1,4 @@
-Param()
+﻿Param()
 
 $ErrorActionPreference = 'Stop'
 
@@ -148,12 +148,13 @@ function Build-Command(){
     '--eval-pdd-type',$cbEvalPdd.SelectedItem,'--eval-pdd-file',$tbEvalPdd.Text,
     '--ref-ocr-type',$cbRefOcr.SelectedItem,'--ref-ocr-file',$tbRefOcr.Text,
     '--eval-ocr-type',$cbEvalOcr.SelectedItem,'--eval-ocr-file',$tbEvalOcr.Text,
-    '--norm-mode',$cbNorm.SelectedItem,'--z-ref',[string]$numZref.Value,
+    '--norm-mode',$cbNorm.SelectedItem,
     '--dd1',[string]$numDD1.Value,'--dta1',[string]$numDTA1.Value,
     '--dd2',[string]$numDD2.Value,'--dta2',[string]$numDTA2.Value,
     '--cutoff',[string]$numCut.Value,'--grid',[string]$numGrid.Value,
     '--smooth-window',[string]$numWin.Value,'--smooth-order',[string]$numOrd.Value,
-    '--center-tol-cm',[string]$numCTol.Value,'--fwhm-warn-cm',[string]$numFwhm.Value)
+    '--center-tol-cm',[string]$numCTol.Value,'--fwhm-warn-cm',[string].Value,'--output-dir',.Text)
+  if ($cbNorm.SelectedItem -eq 'z_ref') { $cmd += @('--z-ref',[string]$numZref.Value) }
   if ($cbNoSmooth.Checked) { $cmd += '--no-smooth' }
   if ($cbCInterp.Checked) { $cmd += '--center-interp' }
   if ($cbXSym.Checked) { $cmd += '--xlim-symmetric' }
@@ -247,4 +248,12 @@ $btnSave.Add_Click({
 
 $btnRun.Add_Click({ $cmd = Build-Command; if($null -ne $cmd){ Run-Cmd $cmd } })
 
+# Enable z_ref input only when norm=z_ref
+$cbNorm.add_SelectedIndexChanged({
+  if ([string]$cbNorm.SelectedItem -eq 'z_ref') { $numZref.Enabled = $true } else { $numZref.Enabled = $false }
+})
+# Set initial enabled state
+if ([string]$cbNorm.SelectedItem -eq 'z_ref') { $numZref.Enabled = $true } else { $numZref.Enabled = $false }
+
 [void]$form.ShowDialog()
+
