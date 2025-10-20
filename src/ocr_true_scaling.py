@@ -423,8 +423,7 @@ def main():
             out_root = cfg_out.get('Paths', 'output_dir', fallback=None)
         except Exception:
             out_root = None
-    if not out_root:
-        out_root = os.path.join(project_root, 'output')
+    # CLI --output-dir overrides config\r\n    if args.output_dir:\r\n        out_root = args.output_dir\r\n    if not out_root:\r\n        out_root = os.path.join(project_root, 'output')
     plot_dir = os.path.join(out_root, 'plots')
     report_dir = os.path.join(out_root, 'reports')
     os.makedirs(plot_dir, exist_ok=True)
@@ -589,4 +588,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
 
