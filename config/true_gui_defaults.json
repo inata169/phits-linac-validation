@@ -1,0 +1,23 @@
+{
+  "output_dir": "output/true_gui",
+  "norm_mode": "dmax",
+  "z_ref": 10.0,
+  "dd1": 2.0,
+  "dta1": 2.0,
+  "dd2": 3.0,
+  "dta2": 3.0,
+  "cutoff": 10.0,
+  "grid": 0.1,
+  "smooth_window": 5,
+  "smooth_order": 2,
+  "no_smooth": false,
+  "center_tol_cm": 0.05,
+  "center_interp": false,
+  "fwhm_warn_cm": 1.0,
+  "xlim_symmetric": false,
+  "export_csv": true,
+  "export_gamma": false,
+  "legend_ref": "Measured",
+  "legend_eval": "PHITS"
+}
+
