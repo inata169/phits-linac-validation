@@ -151,7 +151,7 @@ function Build-Command(){
     '--dd2',[string]$numDD2.Value,'--dta2',[string]$numDTA2.Value,
     '--cutoff',[string]$numCut.Value,'--grid',[string]$numGrid.Value,
     '--smooth-window',[string]$numWin.Value,'--smooth-order',[string]$numOrd.Value,
-    '--center-tol-cm',[string].Value,'--fwhm-warn-cm',[string].Value,'--output-dir',.Text)
+    '--center-tol-cm',[string].Value, '--fwhm-warn-cm',[string].Value, '--output-dir',.Text)
   if ($cbNorm.SelectedItem -eq 'z_ref') { $cmd += @('--z-ref',[string]$numZref.Value) }
   if ($cbNoSmooth.Checked) { $cmd += '--no-smooth' }
   if ($cbCInterp.Checked) { $cmd += '--center-interp' }
@@ -258,5 +258,6 @@ $cbNorm.add_SelectedIndexChanged({
 if ([string]$cbNorm.SelectedItem -eq 'z_ref') { $numZref.Enabled = $true } else { $numZref.Enabled = $false }
 
 [void]$form.ShowDialog()
+
 
 
