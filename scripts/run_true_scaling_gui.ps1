@@ -109,10 +109,12 @@ $form.Controls.Add((New-Label 'Legend eval' 420 276)); $tbLEval = New-Object Sys
 # Run / Open / Log
 $btnRun = New-Button 'Run' 20 310 120 32
 $btnPrev = New-Button 'Preview Depths' 150 310 150 32
-$btnOpen = New-Button 'Open Output' 310 310 160 32
-$lblStatus = New-Label 'Status: Idle' 480 316
+$btnOpen = New-Button 'Open Output' 310 310 140 32
+$btnOpenRep = New-Button 'Open Latest Report' 460 310 160 32
+$btnOpenPlot = New-Button 'Open Latest Plot' 630 310 160 32
+$lblStatus = New-Label 'Status: Idle' 20 346
 $pb = New-Object System.Windows.Forms.ProgressBar; $pb.Location=New-Object System.Drawing.Point(20, 348); $pb.Size=New-Object System.Drawing.Size(800, 10); $pb.Style='Marquee'; $pb.MarqueeAnimationSpeed=25; $pb.Visible=$false
-$form.Controls.Add($btnRun); $form.Controls.Add($btnPrev); $form.Controls.Add($btnOpen); $form.Controls.Add($lblStatus); $form.Controls.Add($pb)
+$form.Controls.Add($btnRun); $form.Controls.Add($btnPrev); $form.Controls.Add($btnOpen); $form.Controls.Add($btnOpenRep); $form.Controls.Add($btnOpenPlot); $form.Controls.Add($lblStatus); $form.Controls.Add($pb)
 
 $tbLog = New-Object System.Windows.Forms.TextBox; $tbLog.Location=New-Object System.Drawing.Point(20,368); $tbLog.Size=New-Object System.Drawing.Size(800,260); $tbLog.Multiline=$true; $tbLog.ScrollBars='Vertical'; $tbLog.ReadOnly=$true; $form.Controls.Add($tbLog)
 
@@ -138,6 +140,24 @@ $btnEvalOcr.Add_Click({ $d = Browse-AnyFile ([ref]$tbEvalOcr) $script:lastEvalOc
 $btnOut.Add_Click({ Browse-Folder ([ref]$tbOut) })
 $btnOpen.Add_Click({ if([string]::IsNullOrWhiteSpace($tbOut.Text)){return}else{ Start-Process explorer.exe $tbOut.Text } })
 $btnPrev.Add_Click({ Preview-Depths })
+
+# Open latest report / plot helpers
+function Open-LatestReport(){
+  if([string]::IsNullOrWhiteSpace($tbOut.Text)) { return }
+  $repDir = Join-Path $tbOut.Text 'reports'
+  if (-not (Test-Path $repDir)) { return }
+  $last = Get-ChildItem -Path $repDir -Filter '*.txt' -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+  if ($last) { Start-Process notepad.exe $last.FullName }
+}
+function Open-LatestPlot(){
+  if([string]::IsNullOrWhiteSpace($tbOut.Text)) { return }
+  $pltDir = Join-Path $tbOut.Text 'plots'
+  if (-not (Test-Path $pltDir)) { return }
+  $last = Get-ChildItem -Path $pltDir -Filter '*.png' -File | Sort-Object LastWriteTime -Descending | Select-Object -First 1
+  if ($last) { Start-Process $last.FullName }
+}
+$btnOpenRep.Add_Click({ Open-LatestReport })
+$btnOpenPlot.Add_Click({ Open-LatestPlot })
 
 # Depth preview helpers
 function Get-DepthFromCsvPath([string]$p){
