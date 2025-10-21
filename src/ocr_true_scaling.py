@@ -510,8 +510,9 @@ def main():
             if args.export_gamma:
                 argv.append('--export-gamma')
             cmd_line = ' '.join(_q(a) for a in argv)
+            prefix = '& ' if os.name == 'nt' else ''
             f.write('\n## Re-run\n')
-            f.write(cmd_line + '\n')
+            f.write(prefix + cmd_line + '\n')
         except Exception:
             pass
     print("Report saved: " + report_path)
@@ -664,8 +665,9 @@ def main():
                 if args.export_gamma:
                     argv.append('--export-gamma')
                 cmd_line = ' '.join(_q(a) for a in argv)
+                prefix = '& ' if os.name == 'nt' else ''
                 f2.write('\n## Re-run\n')
-                f2.write(cmd_line + '\n')
+                f2.write(prefix + cmd_line + '\n')
             except Exception:
                 pass
         print("PDD Report saved: " + pdd_report_path)
