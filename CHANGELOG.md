@@ -2,6 +2,15 @@ Changelog
 
 All notable changes to this project are documented here.
 
+v0.2.0 - 2025-10-21
+
+- Docs: 新規 `docs/openspec.md`（オープン仕様ドラフト）、`docs/examples.md`（実行例）、`docs/dependency_check.md`（依存導入）。
+- CLI: `--report-json` を追加。入力/パラメータ/派生値（深さ、S_axis、FWHM）/結果（RMSE、GPR、出力パス）をJSON保存。
+- CLI: TrueReportに「再実行用コマンドライン」を追記（再現性向上）。
+- Tests: パーサ単体＋CLIスモークテストを追加（`pytest`）。
+- Repo: `.gitattributes` で `*.csv`/`*.txt` を CRLF 固定、READMEの文字化け解消と構成整理。
+- CI: GitHub Actions（Windows/Ubuntu×Python 3.9/3.11）でpytestを実行。
+
 v0.1.0 - 2025-10-21
 
 - CLI: unify ASCII improvements into main `src/ocr_true_scaling.py`.
