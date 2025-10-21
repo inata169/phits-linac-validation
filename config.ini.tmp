@@ -1,9 +1,0 @@
-﻿[Paths]
-# PHITS縺ｮ.out繝輔ぃ繧､繝ｫ縺梧ｼ邏阪＆繧後※縺・ｋ繝輔か繝ｫ繝 data/phits_output/
-phits_data_dir = C:\phits\work\Elekta\6MV\Rev80-5x5-c8-0.49-c12-0.62-E1.05n
-
-# 螳滓ｸｬ縺ｮ.csv繝輔ぃ繧､繝ｫ縺梧ｼ邏阪＆繧後※縺・ｋ繝輔か繝ｫ繝
-measured_data_dir = C:\Users\謾ｾ蟆・ｲｻ逋ら皮ｩｶ逕ｨPC\Documents\Python\phits-linac-validation\data\measured_csv
-
-# 邨先棡・医・繝ｭ繝・ヨ縺ｨ繝ｬ繝昴・繝茨ｼ峨ｒ菫晏ｭ倥☆繧九ヵ繧ｩ繝ｫ繝 output/
-output_dir = C:\phits\work\Elekta\6MV\Rev80-5x5-c8-0.49-c12-0.62-E1.05n
