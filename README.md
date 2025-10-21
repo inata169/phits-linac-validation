@@ -83,3 +83,11 @@ python src/ocr_true_scaling.py \
 
 ## ライセンス
 MIT License
+
+-----
+
+## ガンマモード（global/local）
+- `--gamma-mode {global,local}` でガンマ解析の基準を切替（既定: global）。
+- global: 参照系列の全体最大値を基準に%差を評価（臨床QAで一般的）。
+- local: 各点の局所値を基準に%差を評価（微細な相違に敏感、より厳しめ）。
+- GUIにも切替を追加済み（Gamma: global/local）。
