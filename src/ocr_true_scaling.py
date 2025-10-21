@@ -503,6 +503,25 @@ def main():
             f2.write(f"Gamma 2 (DD={args.dd2:.1f}%, DTA={args.dta2:.1f}mm, Cutoff={args.cutoff:.1f}%): {pdd_g2:.2f}%\n")
         print("PDD Report saved: " + pdd_report_path)
 
+        # PDD plot
+        try:
+            plt.figure(figsize=(10, 6))
+            plt.plot(z_ref_pos, z_ref_norm, label=(args.legend_ref or 'Reference') + ' PDD')
+            plt.plot(z_eval_pos, z_eval_norm, label=(args.legend_eval or 'Evaluation') + ' PDD')
+            plt.title(
+                "PDD comparison [gamma: {}]\n".format(args.gamma_mode)
+                + "norm={}, z_ref={} cm".format(args.norm_mode, args.z_ref)
+            )
+            plt.xlabel('z (cm)')
+            plt.ylabel('PDD (norm)')
+            plt.grid(True, alpha=0.3)
+            plt.legend(title=f"gamma-mode: {args.gamma_mode}")
+            pdd_plot_path = os.path.join(plot_dir, f"PDDComp_{ref_pdd_base}_vs_{eval_pdd_base}_norm-{args.norm_mode}_zref-{args.z_ref:g}.png")
+            plt.savefig(pdd_plot_path)
+            print("PDD Plot saved: " + pdd_plot_path)
+        except Exception:
+            pass
+
     # CSV exports
     if args.export_csv:
         pd.DataFrame({'x_cm': x_ref, 'true_dose': y_true_ref}).to_csv(
