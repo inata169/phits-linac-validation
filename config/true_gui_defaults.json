@@ -8,6 +8,7 @@
     "dta2":  3,
     "cutoff":  10,
     "grid":  0.1,
+    "gamma_mode": "global",
     "smooth_window":  5,
     "smooth_order":  2,
     "no_smooth":  false,
@@ -16,11 +17,11 @@
     "fwhm_warn_cm":  1,
     "xlim_symmetric":  false,
     "export_csv":  true,
-    "export_gamma":  false,
+    "export_gamma":  true,
     "legend_ref":  "Measured",
     "legend_eval":  "PHITS",
-    "last_ref_pdd_dir":  "",
-    "last_eval_pdd_dir":  "",
-    "last_ref_ocr_dir":  "",
-    "last_eval_ocr_dir":  ""
+    "last_ref_pdd_dir":  "C:\\Users\\放射治療研究用PC\\Documents\\Python\\phits-linac-validation\\data\\measured_csv",
+    "last_eval_pdd_dir":  "C:\\phits\\work\\Elekta\\6MV\\Rev70-c8-0.49n",
+    "last_ref_ocr_dir":  "C:\\Users\\放射治療研究用PC\\Documents\\Python\\phits-linac-validation\\data\\measured_csv",
+    "last_eval_ocr_dir":  "C:\\phits\\work\\Elekta\\6MV\\Rev70-c8-0.49n"
 }

@@ -439,6 +439,7 @@ def main():
         f.write(f"eval OCR: {args.eval_ocr_type} | {args.eval_ocr_file}\n")
         f.write('\n## Params\n')
         f.write(f"norm-mode: {args.norm_mode}, z_ref: {args.z_ref} cm\n")
+        f.write(f"gamma-mode: {args.gamma_mode}\n")
         f.write(f"ref depth (cm): {z_depth_ref:.6f}, eval depth (cm): {z_depth_eval:.6f}\n")
         f.write(f"S_axis(ref): {s_axis_ref:.6f}, S_axis(eval): {s_axis_eval:.6f}\n")
         f.write(f"grid (cm): {grid_step:.6f}\n")
