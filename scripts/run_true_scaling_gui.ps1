@@ -86,18 +86,18 @@ $form.Controls.Add($numCut)
 $form.Controls.Add((New-Label 'Grid(cm)' 340 220)); $numGrid = New-Num 400 218 0 5 0.1; $numGrid.DecimalPlaces=2; $numGrid.Increment=0.1
 $form.Controls.Add($numGrid)
 ## Gamma mode (moved to avoid overlap with DTA1)
-$form.Controls.Add((New-Label 'Gamma mode' 520 240))
-$cbGamma = New-Object System.Windows.Forms.ComboBox; $cbGamma.Location=New-Object System.Drawing.Point(600,238); $cbGamma.Size=New-Object System.Drawing.Size(140,22); $cbGamma.DropDownStyle='DropDownList'; $cbGamma.Items.AddRange(@('global','local')); $cbGamma.SelectedIndex=0; $form.Controls.Add($cbGamma)
+$form.Controls.Add((New-Label 'Gamma mode' 520 300))
+$cbGamma = New-Object System.Windows.Forms.ComboBox; $cbGamma.Location=New-Object System.Drawing.Point(600,298); $cbGamma.Size=New-Object System.Drawing.Size(160,22); $cbGamma.DropDownStyle='DropDownList'; $cbGamma.Items.AddRange(@('global','local')); $cbGamma.SelectedIndex=0; $form.Controls.Add($cbGamma)
 
 # PDD report toggle
-$cbNoPdd = New-Object System.Windows.Forms.CheckBox; $cbNoPdd.Text='PDD GPR report OFF'; $cbNoPdd.Location=New-Object System.Drawing.Point(760,238); $cbNoPdd.AutoSize=$true; $cbNoPdd.Checked=$false; $form.Controls.Add($cbNoPdd)
+$cbNoPdd = New-Object System.Windows.Forms.CheckBox; $cbNoPdd.Text='PDD GPR report OFF'; $cbNoPdd.Location=New-Object System.Drawing.Point(780,298); $cbNoPdd.AutoSize=$true; $cbNoPdd.Checked=$false; $form.Controls.Add($cbNoPdd)
 
 # Smoothing / center / FWHM
-$form.Controls.Add((New-Label 'Smooth win' 470 220)); $numWin = New-Num 560 218 1 99 5; $numWin.DecimalPlaces=0; $numWin.Increment=2
+$form.Controls.Add((New-Label 'Smooth win' 500 220)); $numWin = New-Num 620 218 1 99 5; $numWin.DecimalPlaces=0; $numWin.Increment=2
 $form.Controls.Add($numWin)
-$form.Controls.Add((New-Label 'Smooth order' 600 220)); $numOrd = New-Num 700 218 1 9 2; $numOrd.DecimalPlaces=0; $numOrd.Increment=1
+$form.Controls.Add((New-Label 'Smooth order' 740 220)); $numOrd = New-Num 840 218 1 9 2; $numOrd.DecimalPlaces=0; $numOrd.Increment=1
 $form.Controls.Add($numOrd)
-$cbNoSmooth = New-Object System.Windows.Forms.CheckBox; $cbNoSmooth.Text='No smooth'; $cbNoSmooth.Location=New-Object System.Drawing.Point(720,220); $cbNoSmooth.AutoSize=$true; $form.Controls.Add($cbNoSmooth)
+$cbNoSmooth = New-Object System.Windows.Forms.CheckBox; $cbNoSmooth.Text='No smooth'; $cbNoSmooth.Location=New-Object System.Drawing.Point(930,220); $cbNoSmooth.AutoSize=$true; $form.Controls.Add($cbNoSmooth)
 
 $form.Controls.Add((New-Label 'Center tol(cm)' 20 244)); $numCTol = New-Num 110 242 0 1 0.05; $numCTol.DecimalPlaces=3; $numCTol.Increment=0.01; $form.Controls.Add($numCTol)
 $cbCInterp = New-Object System.Windows.Forms.CheckBox; $cbCInterp.Text='Center interp'; $cbCInterp.Location=New-Object System.Drawing.Point(200,244); $cbCInterp.AutoSize=$true; $form.Controls.Add($cbCInterp)
@@ -306,7 +306,7 @@ try {
 } catch {}
 
 # Save Settings
-$btnSave = New-Button 'Save Settings' 660 310 160 32
+$btnSave = New-Button 'Save Settings' 860 300 140 32
 $form.Controls.Add($btnSave)
 $btnSave.Add_Click({
   $new = [ordered]@{
