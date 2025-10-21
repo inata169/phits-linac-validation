@@ -200,6 +200,7 @@ def main():
     ap.add_argument('--center-interp', action='store_true')
     ap.add_argument('--fwhm-warn-cm', type=float, default=1.0)
     ap.add_argument('--output-dir', type=str, default=None)
+    ap.add_argument('--no-pdd-report', action='store_true')
     args = ap.parse_args()
 
     # PDD load & normalise (auto-correct types for convenience)
@@ -457,6 +458,50 @@ def main():
         f.write(f"FWHM(eval) (cm): {_fmt(f2)}\n")
         f.write(f"FWHM delta (eval-ref) (cm): {_fmt(f_delta)}\n")
     print("Report saved: " + report_path)
+
+    # PDD comparison report (always by default; can be disabled by --no-pdd-report)
+    if not args.no_pdd_report:
+        # Resample on common grid for RMSE
+        def resample_1d(x1, y1, x2, y2, step):
+            if not step or step <= 0:
+                return None, None, None
+            xmin = max(np.min(x1), np.min(x2)); xmax = min(np.max(x1), np.max(x2))
+            if xmax - xmin <= step * 2:
+                return None, None, None
+            n = int(np.floor((xmax - xmin) / step)) + 1
+            grid = xmin + np.arange(n + 1) * step
+            return grid, np.interp(grid, x1, y1), np.interp(grid, x2, y2)
+
+        grid_pdd, pdd_ref_g, pdd_eval_g = resample_1d(z_ref_pos, z_ref_norm, z_eval_pos, z_eval_norm, grid_step)
+        if grid_pdd is not None:
+            pdd_rmse = float(np.sqrt(np.mean((pdd_ref_g - pdd_eval_g) ** 2)))
+            zr, yrp = grid_pdd, pdd_ref_g
+            ze, yep = grid_pdd, pdd_eval_g
+        else:
+            pdd_rmse = float(np.sqrt(np.mean((np.interp(z_ref_pos, z_eval_pos, z_eval_norm) - z_ref_norm) ** 2)))
+            zr, yrp = z_ref_pos, z_ref_norm
+            ze, yep = z_eval_pos, z_eval_norm
+
+        pdd_g1 = compute_gamma(zr, yrp, ze, yep, args.dd1, args.dta1, args.cutoff, args.gamma_mode)
+        pdd_g2 = compute_gamma(zr, yrp, ze, yep, args.dd2, args.dta2, args.cutoff, args.gamma_mode)
+
+        ref_pdd_base = os.path.splitext(os.path.basename(args.ref_pdd_file))[0]
+        eval_pdd_base = os.path.splitext(os.path.basename(args.eval_pdd_file))[0]
+        pdd_report_path = os.path.join(report_dir, f"PDDReport_{ref_pdd_base}_vs_{eval_pdd_base}_norm-{args.norm_mode}_zref-{args.z_ref:g}.txt")
+        with open(pdd_report_path, 'w', encoding='utf-8') as f2:
+            f2.write('# PDD comparison report\n\n')
+            f2.write('## Inputs\n')
+            f2.write(f"ref PDD: {args.ref_pdd_type} | {args.ref_pdd_file}\n")
+            f2.write(f"eval PDD: {args.eval_pdd_type} | {args.eval_pdd_file}\n")
+            f2.write('\n## Params\n')
+            f2.write(f"norm-mode: {args.norm_mode}, z_ref: {args.z_ref} cm\n")
+            f2.write(f"gamma-mode: {args.gamma_mode}\n")
+            f2.write(f"grid (cm): {grid_step:.6f}\n")
+            f2.write('\n## Results\n')
+            f2.write(f"RMSE: {pdd_rmse:.6f}\n")
+            f2.write(f"Gamma 1 (DD={args.dd1:.1f}%, DTA={args.dta1:.1f}mm, Cutoff={args.cutoff:.1f}%): {pdd_g1:.2f}%\n")
+            f2.write(f"Gamma 2 (DD={args.dd2:.1f}%, DTA={args.dta2:.1f}mm, Cutoff={args.cutoff:.1f}%): {pdd_g2:.2f}%\n")
+        print("PDD Report saved: " + pdd_report_path)
 
     # CSV exports
     if args.export_csv:

@@ -89,6 +89,9 @@ $form.Controls.Add($numGrid)
 $form.Controls.Add((New-Label 'Gamma' 470 180))
 $cbGamma = New-Object System.Windows.Forms.ComboBox; $cbGamma.Location=New-Object System.Drawing.Point(520,178); $cbGamma.Size=New-Object System.Drawing.Size(110,22); $cbGamma.DropDownStyle='DropDownList'; $cbGamma.Items.AddRange(@('global','local')); $cbGamma.SelectedIndex=0; $form.Controls.Add($cbGamma)
 
+# PDD report toggle
+$cbNoPdd = New-Object System.Windows.Forms.CheckBox; $cbNoPdd.Text='PDD GPR レポートなし'; $cbNoPdd.Location=New-Object System.Drawing.Point(650,178); $cbNoPdd.AutoSize=$true; $cbNoPdd.Checked=$false; $form.Controls.Add($cbNoPdd)
+
 # Smoothing / center / FWHM
 $form.Controls.Add((New-Label 'Smooth win' 470 212)); $numWin = New-Num 540 210 1 99 5; $numWin.DecimalPlaces=0; $numWin.Increment=2
 $form.Controls.Add($numWin)
@@ -216,6 +219,7 @@ function Build-Command(){
   if ($cbNoSmooth.Checked) { $cmd += '--no-smooth' }
   if ($cbCInterp.Checked) { $cmd += '--center-interp' }
   if ($cbXSym.Checked) { $cmd += '--xlim-symmetric' }
+  if ($cbNoPdd.Checked) { $cmd += '--no-pdd-report' }
   if ($cbCSV.Checked) { $cmd += '--export-csv' }
   if ($cbGAM.Checked) { $cmd += '--export-gamma' }
   return $cmd
@@ -273,6 +277,7 @@ try {
   if ($cfg.cutoff) { $numCut.Value = [decimal]$cfg.cutoff }
   if ($cfg.grid) { $numGrid.Value = [decimal]$cfg.grid }
   if ($cfg.gamma_mode) { $i = $cbGamma.Items.IndexOf([string]$cfg.gamma_mode); if($i -ge 0){ $cbGamma.SelectedIndex=$i } }
+  if ($cfg.no_pdd_report -ne $null) { $cbNoPdd.Checked = [bool]$cfg.no_pdd_report }
   if ($cfg.smooth_window) { $numWin.Value = [decimal]$cfg.smooth_window }
   if ($cfg.smooth_order) { $numOrd.Value = [decimal]$cfg.smooth_order }
   if ($cfg.no_smooth) { $cbNoSmooth.Checked = [bool]$cfg.no_smooth }
@@ -301,6 +306,7 @@ $btnSave.Add_Click({
     cutoff = [double]$numCut.Value
     grid = [double]$numGrid.Value
     gamma_mode = [string]$cbGamma.SelectedItem
+    no_pdd_report = [bool]$cbNoPdd.Checked
     smooth_window = [int]$numWin.Value
     smooth_order = [int]$numOrd.Value
     no_smooth = [bool]$cbNoSmooth.Checked

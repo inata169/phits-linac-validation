@@ -9,6 +9,7 @@
     "cutoff":  10,
     "grid":  0.1,
     "gamma_mode": "global",
+    "no_pdd_report": false,
     "smooth_window":  5,
     "smooth_order":  2,
     "no_smooth":  false,
