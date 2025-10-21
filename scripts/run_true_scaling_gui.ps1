@@ -85,6 +85,9 @@ $form.Controls.Add((New-Label 'Cutoff(%)' 180 212)); $numCut = New-Num 250 210 0
 $form.Controls.Add($numCut)
 $form.Controls.Add((New-Label 'Grid(cm)' 340 212)); $numGrid = New-Num 400 210 0 5 0.1; $numGrid.DecimalPlaces=2; $numGrid.Increment=0.1
 $form.Controls.Add($numGrid)
+## Gamma mode
+$form.Controls.Add((New-Label 'Gamma' 470 180))
+$cbGamma = New-Object System.Windows.Forms.ComboBox; $cbGamma.Location=New-Object System.Drawing.Point(520,178); $cbGamma.Size=New-Object System.Drawing.Size(110,22); $cbGamma.DropDownStyle='DropDownList'; $cbGamma.Items.AddRange(@('global','local')); $cbGamma.SelectedIndex=0; $form.Controls.Add($cbGamma)
 
 # Smoothing / center / FWHM
 $form.Controls.Add((New-Label 'Smooth win' 470 212)); $numWin = New-Num 540 210 1 99 5; $numWin.DecimalPlaces=0; $numWin.Increment=2
@@ -206,7 +209,7 @@ function Build-Command(){
     '--norm-mode',$cbNorm.SelectedItem,
     '--dd1',[string]$numDD1.Value,'--dta1',[string]$numDTA1.Value,
     '--dd2',[string]$numDD2.Value,'--dta2',[string]$numDTA2.Value,
-    '--cutoff',[string]$numCut.Value,'--grid',[string]$numGrid.Value,
+    '--cutoff',[string]$numCut.Value,'--grid',[string]$numGrid.Value,'--gamma-mode',[string]$cbGamma.SelectedItem,
     '--smooth-window',[string]$numWin.Value,'--smooth-order',[string]$numOrd.Value,
     '--center-tol-cm',[string]$numCTol.Value,'--fwhm-warn-cm',[string]$numFwhm.Value,'--output-dir',$tbOut.Text)
   if ($cbNorm.SelectedItem -eq 'z_ref') { $cmd += @('--z-ref',[string]$numZref.Value) }
@@ -269,6 +272,7 @@ try {
   if ($cfg.dta2) { $numDTA2.Value = [decimal]$cfg.dta2 }
   if ($cfg.cutoff) { $numCut.Value = [decimal]$cfg.cutoff }
   if ($cfg.grid) { $numGrid.Value = [decimal]$cfg.grid }
+  if ($cfg.gamma_mode) { $i = $cbGamma.Items.IndexOf([string]$cfg.gamma_mode); if($i -ge 0){ $cbGamma.SelectedIndex=$i } }
   if ($cfg.smooth_window) { $numWin.Value = [decimal]$cfg.smooth_window }
   if ($cfg.smooth_order) { $numOrd.Value = [decimal]$cfg.smooth_order }
   if ($cfg.no_smooth) { $cbNoSmooth.Checked = [bool]$cfg.no_smooth }
@@ -296,6 +300,7 @@ $btnSave.Add_Click({
     dta2 = [double]$numDTA2.Value
     cutoff = [double]$numCut.Value
     grid = [double]$numGrid.Value
+    gamma_mode = [string]$cbGamma.SelectedItem
     smooth_window = [int]$numWin.Value
     smooth_order = [int]$numOrd.Value
     no_smooth = [bool]$cbNoSmooth.Checked
