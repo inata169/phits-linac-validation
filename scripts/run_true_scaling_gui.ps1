@@ -79,11 +79,11 @@ $form.Controls.Add((New-Label 'DTA1(mm)' 460 180)); $numDTA1 = New-Num 530 178 0
 $form.Controls.Add($numDTA1)
 $form.Controls.Add((New-Label 'DD2(%)' 620 180)); $numDD2 = New-Num 670 178 0 10 3; $numDD2.DecimalPlaces=1; $numDD2.Increment=0.1
 $form.Controls.Add($numDD2)
-$form.Controls.Add((New-Label 'DTA2(mm)' 20 212)); $numDTA2 = New-Num 90 210 0 10 3; $numDTA2.DecimalPlaces=1; $numDTA2.Increment=0.5
+$form.Controls.Add((New-Label 'DTA2(mm)' 20 220)); $numDTA2 = New-Num 90 218 0 10 3; $numDTA2.DecimalPlaces=1; $numDTA2.Increment=0.5
 $form.Controls.Add($numDTA2)
-$form.Controls.Add((New-Label 'Cutoff(%)' 180 212)); $numCut = New-Num 250 210 0 50 10; $numCut.DecimalPlaces=1; $numCut.Increment=1
+$form.Controls.Add((New-Label 'Cutoff(%)' 180 220)); $numCut = New-Num 250 218 0 50 10; $numCut.DecimalPlaces=1; $numCut.Increment=1
 $form.Controls.Add($numCut)
-$form.Controls.Add((New-Label 'Grid(cm)' 340 212)); $numGrid = New-Num 400 210 0 5 0.1; $numGrid.DecimalPlaces=2; $numGrid.Increment=0.1
+$form.Controls.Add((New-Label 'Grid(cm)' 340 220)); $numGrid = New-Num 400 218 0 5 0.1; $numGrid.DecimalPlaces=2; $numGrid.Increment=0.1
 $form.Controls.Add($numGrid)
 ## Gamma mode (moved to avoid overlap with DTA1)
 $form.Controls.Add((New-Label 'Gamma mode' 520 240))
@@ -93,11 +93,11 @@ $cbGamma = New-Object System.Windows.Forms.ComboBox; $cbGamma.Location=New-Objec
 $cbNoPdd = New-Object System.Windows.Forms.CheckBox; $cbNoPdd.Text='PDD GPR report OFF'; $cbNoPdd.Location=New-Object System.Drawing.Point(760,238); $cbNoPdd.AutoSize=$true; $cbNoPdd.Checked=$false; $form.Controls.Add($cbNoPdd)
 
 # Smoothing / center / FWHM
-$form.Controls.Add((New-Label 'Smooth win' 470 212)); $numWin = New-Num 540 210 1 99 5; $numWin.DecimalPlaces=0; $numWin.Increment=2
+$form.Controls.Add((New-Label 'Smooth win' 470 220)); $numWin = New-Num 560 218 1 99 5; $numWin.DecimalPlaces=0; $numWin.Increment=2
 $form.Controls.Add($numWin)
-$form.Controls.Add((New-Label 'Smooth order' 600 212)); $numOrd = New-Num 700 210 1 9 2; $numOrd.DecimalPlaces=0; $numOrd.Increment=1
+$form.Controls.Add((New-Label 'Smooth order' 600 220)); $numOrd = New-Num 700 218 1 9 2; $numOrd.DecimalPlaces=0; $numOrd.Increment=1
 $form.Controls.Add($numOrd)
-$cbNoSmooth = New-Object System.Windows.Forms.CheckBox; $cbNoSmooth.Text='No smooth'; $cbNoSmooth.Location=New-Object System.Drawing.Point(720,212); $cbNoSmooth.AutoSize=$true; $form.Controls.Add($cbNoSmooth)
+$cbNoSmooth = New-Object System.Windows.Forms.CheckBox; $cbNoSmooth.Text='No smooth'; $cbNoSmooth.Location=New-Object System.Drawing.Point(720,220); $cbNoSmooth.AutoSize=$true; $form.Controls.Add($cbNoSmooth)
 
 $form.Controls.Add((New-Label 'Center tol(cm)' 20 244)); $numCTol = New-Num 110 242 0 1 0.05; $numCTol.DecimalPlaces=3; $numCTol.Increment=0.01; $form.Controls.Add($numCTol)
 $cbCInterp = New-Object System.Windows.Forms.CheckBox; $cbCInterp.Text='Center interp'; $cbCInterp.Location=New-Object System.Drawing.Point(200,244); $cbCInterp.AutoSize=$true; $form.Controls.Add($cbCInterp)
@@ -109,20 +109,20 @@ $cbXSym = New-Object System.Windows.Forms.CheckBox; $cbXSym.Text='Xlim symmetric
 $cbCSV = New-Object System.Windows.Forms.CheckBox; $cbCSV.Text='Export True CSV'; $cbCSV.Location=New-Object System.Drawing.Point(540,270); $cbCSV.AutoSize=$true; $form.Controls.Add($cbCSV)
 $cbGAM = New-Object System.Windows.Forms.CheckBox; $cbGAM.Text='Export Gamma CSV'; $cbGAM.Location=New-Object System.Drawing.Point(700,270); $cbGAM.AutoSize=$true; $form.Controls.Add($cbGAM)
 
-$form.Controls.Add((New-Label 'Legend ref' 20 276)); $tbLRef = New-Object System.Windows.Forms.TextBox; $tbLRef.Location=New-Object System.Drawing.Point(100,274); $tbLRef.Size=New-Object System.Drawing.Size(300,22); $form.Controls.Add($tbLRef)
-$form.Controls.Add((New-Label 'Legend eval' 420 276)); $tbLEval = New-Object System.Windows.Forms.TextBox; $tbLEval.Location=New-Object System.Drawing.Point(500,274); $tbLEval.Size=New-Object System.Drawing.Size(300,22); $form.Controls.Add($tbLEval)
+$form.Controls.Add((New-Label 'Legend ref' 20 340)); $tbLRef = New-Object System.Windows.Forms.TextBox; $tbLRef.Location=New-Object System.Drawing.Point(100,338); $tbLRef.Size=New-Object System.Drawing.Size(300,22); $form.Controls.Add($tbLRef)
+$form.Controls.Add((New-Label 'Legend eval' 420 340)); $tbLEval = New-Object System.Windows.Forms.TextBox; $tbLEval.Location=New-Object System.Drawing.Point(500,338); $tbLEval.Size=New-Object System.Drawing.Size(300,22); $form.Controls.Add($tbLEval)
 
 # Run / Open / Log
-$btnRun = New-Button 'Run' 20 310 120 32
-$btnPrev = New-Button 'Preview Depths' 150 310 150 32
-$btnOpen = New-Button 'Open Output' 310 310 140 32
-$btnOpenRep = New-Button 'Open Latest Report' 460 310 160 32
-$btnOpenPlot = New-Button 'Open Latest Plot' 630 310 160 32
-$lblStatus = New-Label 'Status: Idle' 20 346
-$pb = New-Object System.Windows.Forms.ProgressBar; $pb.Location=New-Object System.Drawing.Point(20, 348); $pb.Size=New-Object System.Drawing.Size(800, 10); $pb.Style='Marquee'; $pb.MarqueeAnimationSpeed=25; $pb.Visible=$false
+$btnRun = New-Button 'Run' 20 380 120 32
+$btnPrev = New-Button 'Preview Depths' 150 380 150 32
+$btnOpen = New-Button 'Open Output' 310 380 140 32
+$btnOpenRep = New-Button 'Open Latest Report' 460 380 160 32
+$btnOpenPlot = New-Button 'Open Latest Plot' 630 380 160 32
+$lblStatus = New-Label 'Status: Idle' 20 416
+$pb = New-Object System.Windows.Forms.ProgressBar; $pb.Location=New-Object System.Drawing.Point(20, 420); $pb.Size=New-Object System.Drawing.Size(800, 10); $pb.Style='Marquee'; $pb.MarqueeAnimationSpeed=25; $pb.Visible=$false
 $form.Controls.Add($btnRun); $form.Controls.Add($btnPrev); $form.Controls.Add($btnOpen); $form.Controls.Add($btnOpenRep); $form.Controls.Add($btnOpenPlot); $form.Controls.Add($lblStatus); $form.Controls.Add($pb)
 
-$tbLog = New-Object System.Windows.Forms.TextBox; $tbLog.Location=New-Object System.Drawing.Point(20,368); $tbLog.Size=New-Object System.Drawing.Size(800,260); $tbLog.Multiline=$true; $tbLog.ScrollBars='Vertical'; $tbLog.ReadOnly=$true; $form.Controls.Add($tbLog)
+$tbLog = New-Object System.Windows.Forms.TextBox; $tbLog.Location=New-Object System.Drawing.Point(20,440); $tbLog.Size=New-Object System.Drawing.Size(800,240); $tbLog.Multiline=$true; $tbLog.ScrollBars='Vertical'; $tbLog.ReadOnly=$true; $form.Controls.Add($tbLog)
 
 function Append-Log($text){ $tbLog.AppendText("$text`r`n") }
 function Browse-AnyFile([ref]$tb, [string]$initialDir){
