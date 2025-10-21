@@ -151,16 +151,17 @@ def center_normalise(pos_cm: np.ndarray, dose: np.ndarray, tol_cm: float, interp
     return pos, (dose / c)
 
 
-def compute_gamma(x_ref_cm, y_ref, x_eval_cm, y_eval, dd, dta, cutoff):
+def compute_gamma(x_ref_cm, y_ref, x_eval_cm, y_eval, dd, dta, cutoff, mode: str):
     if np.max(y_ref) <= 0:
         return 0.0
-    ref_pct = (y_ref / np.max(y_ref)) * 100.0
-    eval_pct = (y_eval / np.max(y_ref)) * 100.0
+    global_norm = float(np.max(y_ref))
     g = pymedphys.gamma(
-        axes_reference=(x_ref_cm * 10.0,), dose_reference=ref_pct,
-        axes_evaluation=(x_eval_cm * 10.0,), dose_evaluation=eval_pct,
+        axes_reference=(x_ref_cm * 10.0,), dose_reference=y_ref,
+        axes_evaluation=(x_eval_cm * 10.0,), dose_evaluation=y_eval,
         dose_percent_threshold=dd, distance_mm_threshold=dta,
         lower_percent_dose_cutoff=cutoff,
+        local_gamma=(mode == 'local'),
+        global_normalisation=global_norm,
     )
     v = g[~np.isnan(g)]
     return float(np.sum(v <= 1.0) / v.size * 100.0) if v.size else 0.0
@@ -182,6 +183,7 @@ def main():
     ap.add_argument('--dta1', type=float, default=2.0)
     ap.add_argument('--dd2', type=float, default=3.0)
     ap.add_argument('--dta2', type=float, default=3.0)
+    ap.add_argument('--gamma-mode', choices=['global', 'local'], default='global')
     ap.add_argument('--cutoff', type=float, default=10.0)
     ap.add_argument('--smooth-window', type=int, default=5)
     ap.add_argument('--smooth-order', type=int, default=2)
@@ -343,8 +345,8 @@ def main():
         xr, yr = x_ref, y_true_ref
         xe, ye = x_eval, y_true_eval
 
-    g1 = compute_gamma(xr, yr, xe, ye, args.dd1, args.dta1, args.cutoff)
-    g2 = compute_gamma(xr, yr, xe, ye, args.dd2, args.dta2, args.cutoff)
+    g1 = compute_gamma(xr, yr, xe, ye, args.dd1, args.dta1, args.cutoff, args.gamma_mode)
+    g2 = compute_gamma(xr, yr, xe, ye, args.dd2, args.dta2, args.cutoff, args.gamma_mode)
     print("RMSE: {:.6f}".format(rmse))
     print("Gamma pass (DD={:.1f}%, DTA={:.1f}mm, Cutoff={:.1f}%): {:.2f}%".format(args.dd1, args.dta1, args.cutoff, g1))
     print("Gamma pass (DD={:.1f}%, DTA={:.1f}mm, Cutoff={:.1f}%): {:.2f}%".format(args.dd2, args.dta2, args.cutoff, g2))
@@ -471,14 +473,14 @@ def main():
                 os.path.join(data_dir, f"TrueEvalResampled_{eval_base}_z{z_depth_eval:g}_grid{grid_step:g}.csv"), index=False, encoding='utf-8'
             )
         if args.export_gamma:
-            ref_pct = (yr / np.max(yr)) * 100.0 if np.max(yr) > 0 else yr
-            eval_pct = (ye / np.max(yr)) * 100.0 if np.max(yr) > 0 else ye
             g = pymedphys.gamma(
-                axes_reference=(xr * 10.0,), dose_reference=ref_pct,
-                axes_evaluation=(xe * 10.0,), dose_evaluation=eval_pct,
+                axes_reference=(xr * 10.0,), dose_reference=yr,
+                axes_evaluation=(xe * 10.0,), dose_evaluation=np.interp(xr, xe, ye),
                 dose_percent_threshold=args.dd1,
                 distance_mm_threshold=args.dta1,
                 lower_percent_dose_cutoff=args.cutoff,
+                local_gamma=(args.gamma_mode == 'local'),
+                global_normalisation=float(np.max(yr)) if np.max(yr) > 0 else 1.0,
             )
             pd.DataFrame({'x_cm': xr, 'true_ref': yr, 'true_eval_interp': np.interp(xr, xe, ye), 'gamma': g}).to_csv(
                 os.path.join(data_dir, f"Gamma_{ref_base}_vs_{eval_base}_z{z_depth_ref:g}-{z_depth_eval:g}.csv"), index=False, encoding='utf-8'
