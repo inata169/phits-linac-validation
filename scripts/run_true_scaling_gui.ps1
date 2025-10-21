@@ -198,7 +198,7 @@ function Build-Command(){
   if([string]::IsNullOrWhiteSpace($tbRefPdd.Text) -or [string]::IsNullOrWhiteSpace($tbEvalPdd.Text) -or [string]::IsNullOrWhiteSpace($tbRefOcr.Text) -or [string]::IsNullOrWhiteSpace($tbEvalOcr.Text) -or [string]::IsNullOrWhiteSpace($tbOut.Text)){
     [System.Windows.Forms.MessageBox]::Show('Please select all required files and output folder.'); return $null }
   New-Item -ItemType Directory -Force -Path $tbOut.Text | Out-Null
-  $cmd = @('python','-u','src/ocr_true_scaling_ascii.py',
+  $cmd = @('python','-u','src/ocr_true_scaling.py',
     '--ref-pdd-type',$cbRefPdd.SelectedItem,'--ref-pdd-file',$tbRefPdd.Text,
     '--eval-pdd-type',$cbEvalPdd.SelectedItem,'--eval-pdd-file',$tbEvalPdd.Text,
     '--ref-ocr-type',$cbRefOcr.SelectedItem,'--ref-ocr-file',$tbRefOcr.Text,

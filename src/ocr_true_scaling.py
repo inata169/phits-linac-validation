@@ -23,7 +23,11 @@ except ModuleNotFoundError as e:
 
 
 def load_csv_profile(path: str) -> Tuple[np.ndarray, np.ndarray]:
-    df0 = pd.read_csv(path, encoding="utf-8-sig", header=None)
+    # Robust CSV loader: try standard CSV, then fallback to whitespace-delimited
+    try:
+        df0 = pd.read_csv(path, encoding="utf-8-sig", header=None)
+    except Exception:
+        df0 = pd.read_csv(path, encoding="utf-8-sig", header=None, delim_whitespace=True)
     if df0.shape[1] >= 2 and isinstance(df0.iloc[0, 0], str) and "(cm)" in str(df0.iloc[0, 0]):
         df = pd.read_csv(path, encoding="utf-8-sig")
         cols = list(df.columns)[:2]
@@ -98,6 +102,19 @@ def parse_phits_out_profile(path: str) -> Tuple[str, np.ndarray, np.ndarray, dic
     if y_center is not None:
         meta["y_center_cm"] = y_center
     return axis or "", pos, (dose / dmax), meta
+
+
+def _extract_depth_cm_from_phits_filename(path: str) -> Optional[float]:
+    try:
+        base = os.path.basename(path)
+        # match ...-200z.out or ...-200x.out or ...-200.out
+        m = re.search(r"-(\d+)([a-z])?\.out$", base, flags=re.IGNORECASE)
+        if not m:
+            return None
+        mm = float(m.group(1))
+        return mm / 10.0
+    except Exception:
+        return None
 
 
 def normalize_pdd(pos_cm: np.ndarray, dose_norm: np.ndarray, mode: str, z_ref_cm: float):
@@ -183,37 +200,89 @@ def main():
     ap.add_argument('--output-dir', type=str, default=None)
     args = ap.parse_args()
 
-    # PDD load & normalise
-    if args.ref_pdd_type == 'csv':
+    # PDD load & normalise (auto-correct types for convenience)
+    ref_pdd_type = args.ref_pdd_type
+    if ref_pdd_type == 'csv' and os.path.basename(args.ref_pdd_file).lower().endswith('.out'):
+        try:
+            print(f"警告: ref PDD が .out のため CSV→PHITS に自動切替: {args.ref_pdd_file}", file=sys.stderr)
+        except Exception:
+            pass
+        ref_pdd_type = 'phits'
+    if ref_pdd_type == 'csv':
         z_ref_pos, z_ref_dose = load_csv_profile(args.ref_pdd_file)
     else:
         _, z_ref_pos, z_ref_dose, _ = parse_phits_out_profile(args.ref_pdd_file)
     z_ref_pos, z_ref_norm = normalize_pdd(z_ref_pos, z_ref_dose, args.norm_mode, args.z_ref)
 
-    if args.eval_pdd_type == 'csv':
+    eval_pdd_type = args.eval_pdd_type
+    if eval_pdd_type == 'csv' and os.path.basename(args.eval_pdd_file).lower().endswith('.out'):
+        try:
+            print(f"警告: eval PDD が .out のため CSV→PHITS に自動切替: {args.eval_pdd_file}", file=sys.stderr)
+        except Exception:
+            pass
+        eval_pdd_type = 'phits'
+    if eval_pdd_type == 'csv':
         z_eval_pos, z_eval_dose = load_csv_profile(args.eval_pdd_file)
     else:
         _, z_eval_pos, z_eval_dose, _ = parse_phits_out_profile(args.eval_pdd_file)
     z_eval_pos, z_eval_norm = normalize_pdd(z_eval_pos, z_eval_dose, args.norm_mode, args.z_ref)
 
     # OCR load & center-normalise
-    if args.ref_ocr_type == 'csv':
+    def _guess_type(p: str) -> str:
+        b = os.path.basename(p).lower()
+        if b.endswith('.out') or b.endswith('.eps'):
+            return 'phits'
+        if b.endswith('.csv'):
+            return 'csv'
+        return 'csv'
+
+    ref_ocr_type = args.ref_ocr_type
+    if ref_ocr_type == 'csv' and _guess_type(args.ref_ocr_file) == 'phits':
+        try:
+            print(f"警告: ref OCR が .out のため CSV→PHITS に自動切替: {args.ref_ocr_file}", file=sys.stderr)
+        except Exception:
+            pass
+        ref_ocr_type = 'phits'
+    if ref_ocr_type == 'csv':
         x_ref, ocr_ref = load_csv_profile(args.ref_ocr_file)
-        m = re.search(r"([0-9]+)\s*cm", os.path.basename(args.ref_ocr_file), re.IGNORECASE)
+        m = re.search(r"([0-9]+(?:\.[0-9]+)?)\s*cm", os.path.basename(args.ref_ocr_file), re.IGNORECASE)
         z_depth_ref = float(m.group(1)) if m else args.z_ref
     else:
         axis, pos, dose, meta = parse_phits_out_profile(args.ref_ocr_file)
-        z_depth_ref = meta.get('y_center_cm', args.z_ref)
+        z_depth_ref = meta.get('y_center_cm', None)
+        if z_depth_ref is None:
+            z_depth_ref = _extract_depth_cm_from_phits_filename(args.ref_ocr_file)
+        if z_depth_ref is None:
+            z_depth_ref = args.z_ref
+            try:
+                print(f"警告: PHITS OCR(ref) の深さをヘッダ/ファイル名から取得できず z_ref={args.z_ref} cm を使用", file=sys.stderr)
+            except Exception:
+                pass
         x_ref, ocr_ref = pos, dose
     x_ref, ocr_ref_rel = center_normalise(x_ref, ocr_ref, tol_cm=args.center_tol_cm, interp=args.center_interp)
 
-    if args.eval_ocr_type == 'csv':
+    eval_ocr_type = args.eval_ocr_type
+    if eval_ocr_type == 'csv' and _guess_type(args.eval_ocr_file) == 'phits':
+        try:
+            print(f"警告: eval OCR が .out のため CSV→PHITS に自動切替: {args.eval_ocr_file}", file=sys.stderr)
+        except Exception:
+            pass
+        eval_ocr_type = 'phits'
+    if eval_ocr_type == 'csv':
         x_eval, ocr_eval = load_csv_profile(args.eval_ocr_file)
-        m = re.search(r"([0-9]+)\s*cm", os.path.basename(args.eval_ocr_file), re.IGNORECASE)
+        m = re.search(r"([0-9]+(?:\.[0-9]+)?)\s*cm", os.path.basename(args.eval_ocr_file), re.IGNORECASE)
         z_depth_eval = float(m.group(1)) if m else args.z_ref
     else:
         axis, pos, dose, meta = parse_phits_out_profile(args.eval_ocr_file)
-        z_depth_eval = meta.get('y_center_cm', args.z_ref)
+        z_depth_eval = meta.get('y_center_cm', None)
+        if z_depth_eval is None:
+            z_depth_eval = _extract_depth_cm_from_phits_filename(args.eval_ocr_file)
+        if z_depth_eval is None:
+            z_depth_eval = args.z_ref
+            try:
+                print(f"警告: PHITS OCR(eval) の深さをヘッダ/ファイル名から取得できず z_ref={args.z_ref} cm を使用", file=sys.stderr)
+            except Exception:
+                pass
         x_eval, ocr_eval = pos, dose
     x_eval, ocr_eval_rel = center_normalise(x_eval, ocr_eval, tol_cm=args.center_tol_cm, interp=args.center_interp)
 
@@ -305,12 +374,13 @@ def main():
         return None if (L is None or R is None) else float(abs(R - L))
 
     f1 = fwhm(x_ref, ocr_ref_rel); f2 = fwhm(x_eval, ocr_eval_rel)
+    f_delta = None
     if f1 is not None and f2 is not None:
-        delta = f2 - f1
-        if abs(delta) > float(args.fwhm_warn_cm):
+        f_delta = f2 - f1
+        if abs(f_delta) > float(args.fwhm_warn_cm):
             print(
-                "Warning: FWHM mismatch |Δ|={:.3f} cm (> {:.3f} cm). ref={:.3f} cm, eval={:.3f} cm".format(
-                    abs(delta), float(args.fwhm_warn_cm), f1, f2
+                "Warning: FWHM mismatch |delta|={:.3f} cm (> {:.3f} cm). ref={:.3f} cm, eval={:.3f} cm".format(
+                    abs(f_delta), float(args.fwhm_warn_cm), f1, f2
                 ),
                 file=sys.stderr,
             )
@@ -374,6 +444,15 @@ def main():
         f.write(f"RMSE: {rmse:.6f}\n")
         f.write(f"Gamma 1 (DD={args.dd1:.1f}%, DTA={args.dta1:.1f}mm, Cutoff={args.cutoff:.1f}%): {g1:.2f}%\n")
         f.write(f"Gamma 2 (DD={args.dd2:.1f}%, DTA={args.dta2:.1f}mm, Cutoff={args.cutoff:.1f}%): {g2:.2f}%\n")
+        # FWHM summary in report
+        def _fmt(v):
+            try:
+                return ("{:.6f}".format(float(v))) if (v is not None and np.isfinite(float(v))) else "N/A"
+            except Exception:
+                return "N/A"
+        f.write(f"FWHM(ref) (cm): {_fmt(f1)}\n")
+        f.write(f"FWHM(eval) (cm): {_fmt(f2)}\n")
+        f.write(f"FWHM delta (eval-ref) (cm): {_fmt(f_delta)}\n")
     print("Report saved: " + report_path)
 
     # CSV exports
@@ -408,4 +487,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
