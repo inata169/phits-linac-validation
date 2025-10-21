@@ -14,3 +14,9 @@ v0.1.0 - 2025-10-21
 - Existing options supported end-to-end via GUI and CLI:
   - `--center-tol-cm`, `--center-interp`, `--fwhm-warn-cm`, `--output-dir`
 
+v0.1.1 - 2025-10-21
+
+- CLI: add `--gamma-mode {global,local}`; compute gamma via pymedphys with proper `local_gamma`/`global_normalisation`; include gamma-mode in report Params and plot title/legend.
+- CLI: add PDD comparison report and plot (default ON); `--no-pdd-report` to suppress.
+- GUI: add Gamma combobox (global/local) and checkbox "PDD GPR レポートなし"; persist `gamma_mode`/`no_pdd_report` in defaults JSON.
+- Docs: README/AGENTS updated for gamma-mode; add openspec specs (proposal, CLI/GUI spec, IO delta, metrics, validation, limitations, future-work, examples).
