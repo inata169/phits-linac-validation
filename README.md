@@ -74,7 +74,8 @@ python src/ocr_true_scaling.py \
 - 真値/再サンプル/γ配列: `output/data/*.csv`（`--export-csv`, `--export-gamma` 指定時）
 
 ## GUI
-- 起動: `powershell -ExecutionPolicy Bypass -File scripts/run_true_scaling_gui.ps1`
+- 起動（簡単）: リポジトリ直下の `run_gui.bat` をダブルクリック
+- 起動（コマンド）: `powershell -ExecutionPolicy Bypass -File scripts/run_true_scaling_gui.ps1`
 - 依存未導入時: `pip install pandas numpy matplotlib scipy pymedphys`
 - フォームで Ref/Eval の PDD/OCR と出力先を選び、Run を押下（出力配下に `plots/`、`reports/`、`data/` が生成）
 
