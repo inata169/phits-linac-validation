@@ -1,4 +1,5 @@
 import argparse
+import json
 import os
 import re
 import sys
@@ -193,6 +194,7 @@ def main():
     ap.add_argument('--ymax', type=float, default=None)
     ap.add_argument('--export-csv', action='store_true')
     ap.add_argument('--export-gamma', action='store_true')
+    ap.add_argument('--report-json', type=str, default=None)
     ap.add_argument('--xlim-symmetric', action='store_true')
     ap.add_argument('--legend-ref', type=str, default=None)
     ap.add_argument('--legend-eval', type=str, default=None)
@@ -458,6 +460,61 @@ def main():
         f.write(f"FWHM(eval) (cm): {_fmt(f2)}\n")
         f.write(f"FWHM delta (eval-ref) (cm): {_fmt(f_delta)}\n")
     print("Report saved: " + report_path)
+
+    # Optional JSON report for automation
+    if args.report_json:
+        def _float(v, default=None):
+            try:
+                return None if v is None else float(v)
+            except Exception:
+                return default
+        payload = {
+            'inputs': {
+                'ref_pdd': {'type': args.ref_pdd_type, 'file': args.ref_pdd_file},
+                'eval_pdd': {'type': args.eval_pdd_type, 'file': args.eval_pdd_file},
+                'ref_ocr': {'type': args.ref_ocr_type, 'file': args.ref_ocr_file},
+                'eval_ocr': {'type': args.eval_ocr_type, 'file': args.eval_ocr_file},
+            },
+            'params': {
+                'norm_mode': args.norm_mode,
+                'z_ref_cm': float(args.z_ref),
+                'gamma_mode': args.gamma_mode,
+                'dd1_percent': float(args.dd1),
+                'dta1_mm': float(args.dta1),
+                'dd2_percent': float(args.dd2),
+                'dta2_mm': float(args.dta2),
+                'cutoff_percent': float(args.cutoff),
+                'grid_cm': float(grid_step) if grid_step is not None else None,
+                'center_tol_cm': float(args.center_tol_cm),
+                'center_interp': bool(args.center_interp),
+                'smooth_enabled': (not args.no_smooth),
+                'smooth_window': int(args.smooth_window),
+                'smooth_order': int(args.smooth_order),
+                'fwhm_warn_cm': float(args.fwhm_warn_cm),
+            },
+            'derived': {
+                'ref_depth_cm': _float(z_depth_ref),
+                'eval_depth_cm': _float(z_depth_eval),
+                'S_axis_ref': _float(s_axis_ref),
+                'S_axis_eval': _float(s_axis_eval),
+                'fwhm_ref_cm': _float(f1),
+                'fwhm_eval_cm': _float(f2),
+                'fwhm_delta_cm': _float(f_delta),
+            },
+            'results': {
+                'rmse': _float(rmse, 0.0),
+                'gamma1_gpr_percent': _float(g1, 0.0),
+                'gamma2_gpr_percent': _float(g2, 0.0),
+                'plot_path': plot_path,
+                'report_path': report_path,
+            }
+        }
+        try:
+            with open(args.report_json, 'w', encoding='utf-8') as jf:
+                json.dump(payload, jf, ensure_ascii=False, indent=2)
+            print("JSON report saved: " + args.report_json)
+        except Exception as e:
+            print("JSON report write failed: " + str(e), file=sys.stderr)
 
     # PDD comparison report (always by default; can be disabled by --no-pdd-report)
     if not args.no_pdd_report:
