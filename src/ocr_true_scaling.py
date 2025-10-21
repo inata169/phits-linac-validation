@@ -400,7 +400,7 @@ def main():
     ref_base = os.path.splitext(os.path.basename(args.ref_ocr_file))[0]
     eval_base = os.path.splitext(os.path.basename(args.eval_ocr_file))[0]
     title = (
-        "True-scaling (PDD-weighted)\n"
+        "True-scaling (PDD-weighted) [gamma: {}]\n".format(args.gamma_mode)
         + "norm={}, z_ref={} cm / ref_z={:.3f} cm, eval_z={:.3f} cm".format(
             args.norm_mode, args.z_ref, z_depth_ref, z_depth_eval
         )
@@ -424,7 +424,7 @@ def main():
     if args.xlim_symmetric:
         xmax = max(abs(np.min(x_ref)), abs(np.max(x_ref)), abs(np.min(x_eval)), abs(np.max(x_eval)))
         plt.xlim(-xmax, xmax)
-    plt.legend()
+    plt.legend(title=f"gamma-mode: {args.gamma_mode}")
     plot_path = os.path.join(plot_dir, f"TrueComp_{ref_base}_vs_{eval_base}_norm-{args.norm_mode}_zref-{args.z_ref:g}_z-{z_depth_ref:g}-{z_depth_eval:g}.png")
     plt.savefig(plot_path)
     print("Plot saved: " + plot_path)
