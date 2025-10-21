@@ -85,9 +85,9 @@ $form.Controls.Add((New-Label 'Cutoff(%)' 180 212)); $numCut = New-Num 250 210 0
 $form.Controls.Add($numCut)
 $form.Controls.Add((New-Label 'Grid(cm)' 340 212)); $numGrid = New-Num 400 210 0 5 0.1; $numGrid.DecimalPlaces=2; $numGrid.Increment=0.1
 $form.Controls.Add($numGrid)
-## Gamma mode
-$form.Controls.Add((New-Label 'Gamma' 470 180))
-$cbGamma = New-Object System.Windows.Forms.ComboBox; $cbGamma.Location=New-Object System.Drawing.Point(520,178); $cbGamma.Size=New-Object System.Drawing.Size(110,22); $cbGamma.DropDownStyle='DropDownList'; $cbGamma.Items.AddRange(@('global','local')); $cbGamma.SelectedIndex=0; $form.Controls.Add($cbGamma)
+## Gamma mode (moved to avoid overlap with DTA1)
+$form.Controls.Add((New-Label 'Gamma' 520 240))
+$cbGamma = New-Object System.Windows.Forms.ComboBox; $cbGamma.Location=New-Object System.Drawing.Point(580,238); $cbGamma.Size=New-Object System.Drawing.Size(110,22); $cbGamma.DropDownStyle='DropDownList'; $cbGamma.Items.AddRange(@('global','local')); $cbGamma.SelectedIndex=0; $form.Controls.Add($cbGamma)
 
 # PDD report toggle
 $cbNoPdd = New-Object System.Windows.Forms.CheckBox; $cbNoPdd.Text='PDD GPR レポートなし'; $cbNoPdd.Location=New-Object System.Drawing.Point(650,178); $cbNoPdd.AutoSize=$true; $cbNoPdd.Checked=$false; $form.Controls.Add($cbNoPdd)
@@ -144,7 +144,12 @@ $btnEvalPdd.Add_Click({ $d = Browse-AnyFile ([ref]$tbEvalPdd) $script:lastEvalPd
 $btnRefOcr.Add_Click({ $d = Browse-AnyFile ([ref]$tbRefOcr) $script:lastRefOcrDir; if($d){ $script:lastRefOcrDir = $d } })
 $btnEvalOcr.Add_Click({ $d = Browse-AnyFile ([ref]$tbEvalOcr) $script:lastEvalOcrDir; if($d){ $script:lastEvalOcrDir = $d } })
 $btnOut.Add_Click({ Browse-Folder ([ref]$tbOut) })
-$btnOpen.Add_Click({ if([string]::IsNullOrWhiteSpace($tbOut.Text)){return}else{ Start-Process explorer.exe $tbOut.Text } })
+$btnOpen.Add_Click({
+  if([string]::IsNullOrWhiteSpace($tbOut.Text)){ return }
+  $root = $tbOut.Text
+  $rep = Join-Path $root 'reports'
+  if (Test-Path $rep) { Start-Process explorer.exe $rep } else { Start-Process explorer.exe $root }
+})
 $btnPrev.Add_Click({ Preview-Depths })
 
 # Open latest report / plot helpers
