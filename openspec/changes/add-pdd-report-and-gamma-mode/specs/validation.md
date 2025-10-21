@@ -1,11 +1,11 @@
-# Validation & Acceptance
+﻿# Validation & Acceptance
 
 ## Data
-- Use `test/` folder data: `test/measured_csv/*` and `test/PHITS/*`.
+- Use `tests/data/` folder data: `tests/data/measured_csv/*` and `tests/data/PHITS/*`.
 
 ## OCR Cases
 1) 5x5 @ 10 cm (xXlat vs 100x)
-   - Expect RMSE ~ 0.02–0.03; global gamma(2/2) ~ 80%+, (3/3) ~ 95%+
+   - Expect RMSE ~ 0.02遯ｶ繝ｻ.03; global gamma(2/2) ~ 80%+, (3/3) ~ 95%+
    - local gamma should be stricter (< global)
    - Verify `TrueReport_*.txt` exists, includes `gamma-mode` and FWHM entries.
 
@@ -21,9 +21,11 @@
   - `--no-pdd-report` suppresses both.
 
 ## Type Autodetect & Depth Inference
-- Supply `.out` with `--*-type csv` → stderr warns and auto-switches to `phits`.
+- Supply `.out` with `--*-type csv` 遶翫・stderr warns and auto-switches to `phits`.
 - PHITS depth inferred from header y-slab or `...-NNNx.out` filename; else fallback `--z-ref`.
 
 ## Output Structure
 - Under chosen `--output-dir`, expect `plots/`, `reports/`, `data/`.
+
+
 
