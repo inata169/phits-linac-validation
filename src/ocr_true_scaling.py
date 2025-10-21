@@ -613,6 +613,61 @@ def main():
             f2.write(f"RMSE: {pdd_rmse:.6f}\n")
             f2.write(f"Gamma 1 (DD={args.dd1:.1f}%, DTA={args.dta1:.1f}mm, Cutoff={args.cutoff:.1f}%): {pdd_g1:.2f}%\n")
             f2.write(f"Gamma 2 (DD={args.dd2:.1f}%, DTA={args.dta2:.1f}mm, Cutoff={args.cutoff:.1f}%): {pdd_g2:.2f}%\n")
+            # Re-run command line (same as TrueReport)
+            try:
+                def _q(v: str) -> str:
+                    v = str(v)
+                    return '"' + v.replace('"', '\\"') + '"' if (' ' in v or '\\' in v) else v
+                argv = [
+                    sys.executable,
+                    os.path.join(prj_root, 'src', 'ocr_true_scaling.py'),
+                    '--ref-pdd-type', args.ref_pdd_type,
+                    '--ref-pdd-file', args.ref_pdd_file,
+                    '--eval-pdd-type', args.eval_pdd_type,
+                    '--eval-pdd-file', args.eval_pdd_file,
+                    '--ref-ocr-type', args.ref_ocr_type,
+                    '--ref-ocr-file', args.ref_ocr_file,
+                    '--eval-ocr-type', args.eval_ocr_type,
+                    '--eval-ocr-file', args.eval_ocr_file,
+                    '--norm-mode', args.norm_mode,
+                    '--z-ref', str(args.z_ref),
+                    '--dd1', str(args.dd1), '--dta1', str(args.dta1),
+                    '--dd2', str(args.dd2), '--dta2', str(args.dta2),
+                    '--gamma-mode', args.gamma_mode,
+                    '--cutoff', str(args.cutoff),
+                    '--smooth-window', str(args.smooth_window),
+                    '--smooth-order', str(args.smooth_order),
+                    '--center-tol-cm', str(args.center_tol_cm),
+                ]
+                if args.center_interp:
+                    argv.append('--center-interp')
+                if args.no_smooth:
+                    argv.append('--no-smooth')
+                if args.grid is not None:
+                    argv.extend(['--grid', str(args.grid)])
+                if args.ymin is not None:
+                    argv.extend(['--ymin', str(args.ymin)])
+                if args.ymax is not None:
+                    argv.extend(['--ymax', str(args.ymax)])
+                if args.xlim_symmetric:
+                    argv.append('--xlim-symmetric')
+                if args.legend_ref:
+                    argv.extend(['--legend-ref', args.legend_ref])
+                if args.legend_eval:
+                    argv.extend(['--legend-eval', args.legend_eval])
+                if args.fwhm_warn_cm is not None:
+                    argv.extend(['--fwhm-warn-cm', str(args.fwhm_warn_cm)])
+                if args.output_dir:
+                    argv.extend(['--output-dir', args.output_dir])
+                if args.export_csv:
+                    argv.append('--export-csv')
+                if args.export_gamma:
+                    argv.append('--export-gamma')
+                cmd_line = ' '.join(_q(a) for a in argv)
+                f2.write('\n## Re-run\n')
+                f2.write(cmd_line + '\n')
+            except Exception:
+                pass
         print("PDD Report saved: " + pdd_report_path)
 
         # PDD plot
