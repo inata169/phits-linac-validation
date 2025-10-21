@@ -26,7 +26,7 @@ function New-Num($x,$y,$min,$max,$val){ $o=New-Object System.Windows.Forms.Numer
 # Form
 $form = New-Object System.Windows.Forms.Form
 $form.Text = 'True Scaling OCR GUI'
-$form.Size = New-Object System.Drawing.Size(980,700)
+$form.Size = New-Object System.Drawing.Size(1080,720)
 $form.StartPosition = 'CenterScreen'
 $form.Font = New-Object System.Drawing.Font('Segoe UI',9)
 
@@ -60,8 +60,8 @@ $form.Controls.Add($cbEvalOcr); $form.Controls.Add($tbEvalOcr); $form.Controls.A
 
 # Output folder
 $form.Controls.Add((New-Label 'Output' 20 148))
-$tbOut = New-TextBox 90 146 700
-$btnOut = New-Button 'Browse' 800 144 60 26
+$tbOut = New-TextBox 90 146 820
+$btnOut = New-Button 'Browse' 920 144 80 26
 $form.Controls.Add($tbOut); $form.Controls.Add($btnOut)
 
 # Norm / z_ref
@@ -87,10 +87,10 @@ $form.Controls.Add((New-Label 'Grid(cm)' 340 212)); $numGrid = New-Num 400 210 0
 $form.Controls.Add($numGrid)
 ## Gamma mode (moved to avoid overlap with DTA1)
 $form.Controls.Add((New-Label 'Gamma mode' 520 240))
-$cbGamma = New-Object System.Windows.Forms.ComboBox; $cbGamma.Location=New-Object System.Drawing.Point(580,238); $cbGamma.Size=New-Object System.Drawing.Size(110,22); $cbGamma.DropDownStyle='DropDownList'; $cbGamma.Items.AddRange(@('global','local')); $cbGamma.SelectedIndex=0; $form.Controls.Add($cbGamma)
+$cbGamma = New-Object System.Windows.Forms.ComboBox; $cbGamma.Location=New-Object System.Drawing.Point(600,238); $cbGamma.Size=New-Object System.Drawing.Size(140,22); $cbGamma.DropDownStyle='DropDownList'; $cbGamma.Items.AddRange(@('global','local')); $cbGamma.SelectedIndex=0; $form.Controls.Add($cbGamma)
 
 # PDD report toggle
-$cbNoPdd = New-Object System.Windows.Forms.CheckBox; $cbNoPdd.Text='PDD GPR report OFF'; $cbNoPdd.Location=New-Object System.Drawing.Point(700,238); $cbNoPdd.AutoSize=$true; $cbNoPdd.Checked=$false; $form.Controls.Add($cbNoPdd)
+$cbNoPdd = New-Object System.Windows.Forms.CheckBox; $cbNoPdd.Text='PDD GPR report OFF'; $cbNoPdd.Location=New-Object System.Drawing.Point(760,238); $cbNoPdd.AutoSize=$true; $cbNoPdd.Checked=$false; $form.Controls.Add($cbNoPdd)
 
 # Smoothing / center / FWHM
 $form.Controls.Add((New-Label 'Smooth win' 470 212)); $numWin = New-Num 540 210 1 99 5; $numWin.DecimalPlaces=0; $numWin.Increment=2
@@ -102,12 +102,12 @@ $cbNoSmooth = New-Object System.Windows.Forms.CheckBox; $cbNoSmooth.Text='No smo
 $form.Controls.Add((New-Label 'Center tol(cm)' 20 244)); $numCTol = New-Num 110 242 0 1 0.05; $numCTol.DecimalPlaces=3; $numCTol.Increment=0.01; $form.Controls.Add($numCTol)
 $cbCInterp = New-Object System.Windows.Forms.CheckBox; $cbCInterp.Text='Center interp'; $cbCInterp.Location=New-Object System.Drawing.Point(200,244); $cbCInterp.AutoSize=$true; $form.Controls.Add($cbCInterp)
 
-$form.Controls.Add((New-Label 'FWHM warn(cm)' 320 244)); $numFwhm = New-Num 410 242 0 5 1.0; $numFwhm.DecimalPlaces=2; $numFwhm.Increment=0.1; $form.Controls.Add($numFwhm)
+$form.Controls.Add((New-Label 'FWHM warn (cm)' 320 244)); $numFwhm = New-Num 430 242 0 5 1.0; $numFwhm.DecimalPlaces=2; $numFwhm.Increment=0.1; $form.Controls.Add($numFwhm)
 
 # Flags / labels
 $cbXSym = New-Object System.Windows.Forms.CheckBox; $cbXSym.Text='Xlim symmetric'; $cbXSym.Location=New-Object System.Drawing.Point(520,244); $cbXSym.AutoSize=$true; $form.Controls.Add($cbXSym)
-$cbCSV = New-Object System.Windows.Forms.CheckBox; $cbCSV.Text='Export True CSV'; $cbCSV.Location=New-Object System.Drawing.Point(640,244); $cbCSV.AutoSize=$true; $form.Controls.Add($cbCSV)
-$cbGAM = New-Object System.Windows.Forms.CheckBox; $cbGAM.Text='Export Gamma CSV'; $cbGAM.Location=New-Object System.Drawing.Point(740,244); $cbGAM.AutoSize=$true; $form.Controls.Add($cbGAM)
+$cbCSV = New-Object System.Windows.Forms.CheckBox; $cbCSV.Text='Export True CSV'; $cbCSV.Location=New-Object System.Drawing.Point(540,270); $cbCSV.AutoSize=$true; $form.Controls.Add($cbCSV)
+$cbGAM = New-Object System.Windows.Forms.CheckBox; $cbGAM.Text='Export Gamma CSV'; $cbGAM.Location=New-Object System.Drawing.Point(700,270); $cbGAM.AutoSize=$true; $form.Controls.Add($cbGAM)
 
 $form.Controls.Add((New-Label 'Legend ref' 20 276)); $tbLRef = New-Object System.Windows.Forms.TextBox; $tbLRef.Location=New-Object System.Drawing.Point(100,274); $tbLRef.Size=New-Object System.Drawing.Size(300,22); $form.Controls.Add($tbLRef)
 $form.Controls.Add((New-Label 'Legend eval' 420 276)); $tbLEval = New-Object System.Windows.Forms.TextBox; $tbLEval.Location=New-Object System.Drawing.Point(500,274); $tbLEval.Size=New-Object System.Drawing.Size(300,22); $form.Controls.Add($tbLEval)
