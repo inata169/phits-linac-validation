@@ -21,7 +21,7 @@ def _import_module():
 
 def test_load_csv_profile_normalises_max_to_one():
     mod = _import_module()
-    path = os.path.join("test", "measured_csv", "05x05m05cm-xXlat.csv")
+    path = os.path.join("tests", "data", "measured_csv", "05x05m05cm-xXlat.csv")
     x, y = mod.load_csv_profile(path)
     assert len(x) > 10 and len(y) == len(x)
     assert abs(float(y.max()) - 1.0) < 1e-6
@@ -29,7 +29,7 @@ def test_load_csv_profile_normalises_max_to_one():
 
 def test_parse_phits_out_profile_returns_normalised_series():
     mod = _import_module()
-    path = os.path.join("test", "PHITS", "deposit-y-water-100x.out")
+    path = os.path.join("tests", "data", "PHITS", "deposit-y-water-100x.out")
     axis, x, y, meta = mod.parse_phits_out_profile(path)
     assert isinstance(axis, str)
     assert len(x) > 0 and len(y) == len(x)
@@ -48,4 +48,3 @@ def test_center_normalise_aligns_origin_and_scales_center_to_one():
     assert abs(float(xx[np.argmin(abs(xx))])) < 1e-12
     # Center scaling
     assert abs(float(yy[np.argmin(abs(xx))]) - 1.0) < 1e-12
-

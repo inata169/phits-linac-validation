@@ -22,10 +22,10 @@ def test_cli_smoke_generates_reports_and_plots(tmp_path):
     py = sys.executable
     script = os.path.join(repo_root, "src", "ocr_true_scaling.py")
 
-    ref_pdd = os.path.join(repo_root, "test", "measured_csv", "05x05mPDD-zZver.csv")
-    eval_pdd = os.path.join(repo_root, "test", "PHITS", "deposit-z-water.out")
-    ref_ocr = os.path.join(repo_root, "test", "measured_csv", "05x05m10cm-xXlat.csv")
-    eval_ocr = os.path.join(repo_root, "test", "PHITS", "deposit-y-water-100x.out")
+    ref_pdd = os.path.join(repo_root, "tests", "data", "measured_csv", "05x05mPDD-zZver.csv")
+    eval_pdd = os.path.join(repo_root, "tests", "data", "PHITS", "deposit-z-water.out")
+    ref_ocr = os.path.join(repo_root, "tests", "data", "measured_csv", "05x05m10cm-xXlat.csv")
+    eval_ocr = os.path.join(repo_root, "tests", "data", "PHITS", "deposit-y-water-100x.out")
 
     out_dir = tmp_path / "out"
     out_dir.mkdir()
@@ -54,4 +54,6 @@ def test_cli_smoke_generates_reports_and_plots(tmp_path):
     report_path = payload["results"]["report_path"]
     assert os.path.exists(plot_path), "plot not created"
     assert os.path.exists(report_path), "report not created"
+
+
 
