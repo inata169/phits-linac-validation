@@ -15,7 +15,8 @@ env/
 # This is the most important folder for your project to ignore.
 # The script generates these files, so they don't need to be stored on GitHub.
 output/
-temp/
+temp/*
+!temp/.gitkeep
 config.ini
 data/phits_output/
 .ipynb_checkpoints/
