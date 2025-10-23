@@ -32,6 +32,10 @@ jobs:
           $exe = Get-ChildItem -Recurse -Filter "ocr_true_scaling*.exe" dist | Select-Object -First 1
           if (-not $exe) { Write-Error "EXE not found under dist/"; exit 1 }
           echo "exe_path=$($exe.FullName)" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+      - name: Smoke run EXE (-V)
+        shell: pwsh
+        run: |
+          & "${{ steps.find_exe.outputs.exe_path }}" -V
       - name: Prepare artifacts (rename + SHA256)
         id: prep
         shell: pwsh
