@@ -80,8 +80,33 @@ jobs:
           if (Test-Path $name) {
             echo "notes_path=$name" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           }
-      - name: Upload to Release (with notes)
-        if: steps.notes.outputs.notes_path != ''
+      # Prefer a fine-grained PAT if provided (repo secret: GH_RELEASE_TOKEN)
+      - name: Upload to Release (with notes, PAT)
+        if: steps.notes.outputs.notes_path != '' && secrets.GH_RELEASE_TOKEN != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          body_path: ${{ steps.notes.outputs.notes_path }}
+          files: |
+            ${{ steps.prep.outputs.artifact }}
+            ${{ steps.prep.outputs.sha256 }}
+          token: ${{ secrets.GH_RELEASE_TOKEN }}
+      - name: Upload to Release (auto notes, PAT)
+        if: steps.notes.outputs.notes_path == '' && secrets.GH_RELEASE_TOKEN != ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          generate_release_notes: true
+          files: |
+            ${{ steps.prep.outputs.artifact }}
+            ${{ steps.prep.outputs.sha256 }}
+          token: ${{ secrets.GH_RELEASE_TOKEN }}
+
+      # Fallback to GITHUB_TOKEN (requires repo Setting → Actions → Workflow permissions: Read and write)
+      - name: Upload to Release (with notes, GITHUB_TOKEN)
+        if: steps.notes.outputs.notes_path != '' && (secrets.GH_RELEASE_TOKEN == '')
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
@@ -92,8 +117,8 @@ jobs:
             ${{ steps.prep.outputs.sha256 }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload to Release (auto notes)
-        if: steps.notes.outputs.notes_path == ''
+      - name: Upload to Release (auto notes, GITHUB_TOKEN)
+        if: steps.notes.outputs.notes_path == '' && (secrets.GH_RELEASE_TOKEN == '')
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
