@@ -2,6 +2,13 @@ Changelog
 
 All notable changes to this project are documented here.
 
+v0.2.1 - 2025-10-23
+
+- CLI: add `-V/--version` (reports tool version; 0.2.1).
+- Docs: README quickstart + Windows EXE usage note; OpenSpec aligned with v0.2.1 and documented `--version`.
+- CI: headless stability (MPLBACKEND=Agg, UTF-8); pip cache via requirements.txt; Windows fixes by adding `numba`, `llvmlite`, `interpolation`.
+- Release: GitHub Actions workflow to build Windows EXE and upload to Release on tag/release.
+
 v0.2.0 - 2025-10-21
 
 - Docs: 新規 `docs/openspec.md`（オープン仕様ドラフト）、`docs/examples.md`（実行例）、`docs/dependency_check.md`（依存導入）。

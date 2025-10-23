@@ -1,6 +1,9 @@
 name: Release (Build and Upload EXE)
 
 on:
+  push:
+    tags:
+      - 'v*'
   release:
     types: [published]
 
@@ -32,8 +35,9 @@ jobs:
       - name: Upload to Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
           files: |
             ${{ steps.find_exe.outputs.exe_path }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
