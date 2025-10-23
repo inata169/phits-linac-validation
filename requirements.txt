@@ -4,3 +4,5 @@ matplotlib
 scipy
 pymedphys
 pytest
+numba
+llvmlite
