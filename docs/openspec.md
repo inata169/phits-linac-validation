@@ -2,7 +2,7 @@
 
 This document defines the open specification for comparing measured CSV profiles and PHITS `.out` outputs using the PDD‑weighted “true scaling” method. It standardises data formats, CLI interface, processing flow, thresholds, outputs, and error policy to enable reproducible analysis across environments.
 
-Status: draft, aligned with `src/ocr_true_scaling.py` current behavior.
+Status: aligned with `src/ocr_true_scaling.py` v0.2.1 (stable).
 
 ## Scope
 - Inputs: measured CSV (PDD/OCR), PHITS `.out` (PDD/OCR)
@@ -25,6 +25,9 @@ Status: draft, aligned with `src/ocr_true_scaling.py` current behavior.
   - Depth metadata for OCR: prefer header `# y = (y0 .. y1)` as center; else infer from filename suffix `-<mm>[x|z].out` → depth cm; else fallback to `--z-ref`.
 
 ## CLI Interface (ocr_true_scaling)
+General:
+- `-V` `--version` print tool version and exit.
+
 Required pairs (reference vs evaluation):
 - `--ref-pdd-type {csv,phits}` `--ref-pdd-file <path>`
 - `--eval-pdd-type {csv,phits}` `--eval-pdd-file <path>`
