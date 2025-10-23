@@ -5,7 +5,8 @@ scipy
 pytest
 
 # Gamma and its dependencies (pinned for CI stability)
-pymedphys==0.41.*
+pymedphys==0.41.*; python_version >= "3.10"
+pymedphys==0.40.*; python_version < "3.10"
 numba~=0.59
 llvmlite~=0.42
 interpolation~=2.2
