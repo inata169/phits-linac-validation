@@ -12,6 +12,7 @@ jobs:
     env:
       MPLBACKEND: Agg
       PYTHONIOENCODING: utf-8
+      PIP_DISABLE_PIP_VERSION_CHECK: '1'
     strategy:
       fail-fast: false
       matrix:
@@ -23,7 +24,14 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
           cache: 'pip'
-      - name: Install dependencies
+          cache-dependency-path: requirements.txt
+      - name: Install dependencies (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          python -m pip install -U pip
+          python -m pip install --prefer-binary -r requirements.txt
+      - name: Install dependencies (Ubuntu)
+        if: runner.os != 'Windows'
         run: |
           python -m pip install -U pip
           python -m pip install -r requirements.txt

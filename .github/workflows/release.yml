@@ -34,6 +34,8 @@ jobs:
           echo "exe_path=$($exe.FullName)" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
       - name: Smoke run EXE (-V)
         shell: pwsh
+        env:
+          OCR_TS_SKIP_IMPORTS: '1'
         run: |
           & "${{ steps.find_exe.outputs.exe_path }}" -V
       - name: Prepare artifacts (rename + SHA256)

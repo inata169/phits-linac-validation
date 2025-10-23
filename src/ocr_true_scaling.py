@@ -11,18 +11,21 @@ import pandas as pd
 
 __version__ = "0.2.1"
 
-try:
-    import matplotlib.pyplot as plt
-    from scipy.signal import savgol_filter
-    import pymedphys
-except ModuleNotFoundError as e:
-    print(
-        "Missing dependencies: "
-        + str(e)
-        + ". Please install: pip install pandas numpy matplotlib scipy pymedphys",
-        file=sys.stderr,
-    )
-    sys.exit(1)
+# Allow skipping heavy optional imports for fast version/help checks
+_SKIP_IMPORTS = os.environ.get("OCR_TS_SKIP_IMPORTS") == "1"
+if not _SKIP_IMPORTS:
+    try:
+        import matplotlib.pyplot as plt  # type: ignore
+        from scipy.signal import savgol_filter  # type: ignore
+        import pymedphys  # type: ignore
+    except ModuleNotFoundError as e:
+        print(
+            "Missing dependencies: "
+            + str(e)
+            + ". Please install: pip install pandas numpy matplotlib scipy pymedphys",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
 
 def load_csv_profile(path: str) -> Tuple[np.ndarray, np.ndarray]:
