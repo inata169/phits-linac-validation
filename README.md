@@ -3,6 +3,8 @@
 [![release](https://img.shields.io/github/v/release/inata169/phits-linac-validation?include_prereleases&label=release)](https://github.com/inata169/phits-linac-validation/releases/latest)
 ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue)
 
+日本語の仕様書: docs/manual_ja.md
+
 PHITS の出力（`.out`）と実測 CSV を読み込み、線量プロファイル（PDD/OCR）の比較（ガンマ、RMSE）を行うツール群です。推奨フローは PDD を用いた「真値スケーリング」による OCR 比較です。
 
 ---
