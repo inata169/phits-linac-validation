@@ -32,11 +32,32 @@ jobs:
           $exe = Get-ChildItem -Recurse -Filter "ocr_true_scaling*.exe" dist | Select-Object -First 1
           if (-not $exe) { Write-Error "EXE not found under dist/"; exit 1 }
           echo "exe_path=$($exe.FullName)" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-      - name: Upload to Release
+      - name: Determine release notes file
+        id: notes
+        shell: pwsh
+        run: |
+          $name = "RELEASE_NOTES_${{ github.ref_name }}.md"
+          if (Test-Path $name) {
+            echo "notes_path=$name" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          }
+      - name: Upload to Release (with notes)
+        if: steps.notes.outputs.notes_path != ''
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: Release ${{ github.ref_name }}
+          body_path: ${{ steps.notes.outputs.notes_path }}
+          files: |
+            ${{ steps.find_exe.outputs.exe_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload to Release (auto notes)
+        if: steps.notes.outputs.notes_path == ''
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          generate_release_notes: true
           files: |
             ${{ steps.find_exe.outputs.exe_path }}
         env:

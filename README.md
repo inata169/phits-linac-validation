@@ -1,6 +1,6 @@
 ﻿# PHITS 蛹ｻ逋ら畑繝ｪ繝九い繝・け邱夐㍼隧穂ｾ｡繝・・繝ｫ
 
-[![release](https://img.shields.io/github/v/release/inata169/phits-linac-validation?include_prereleases&label=release)](LICENSE)
+[![release](https://img.shields.io/github/v/release/inata169/phits-linac-validation?include_prereleases&label=release)](https://github.com/inata169/phits-linac-validation/releases/latest)
 ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue)
 
 PHITS 縺ｮ蜃ｺ蜉幢ｼ・out・峨→螳滓ｸｬ CSV 繧定ｪｭ縺ｿ霎ｼ縺ｿ縲∫ｷ夐㍼繝励Ο繝輔ぃ繧､繝ｫ・・DD/OCR・峨・豈碑ｼ・ｩ穂ｾ｡・医ぎ繝ｳ繝槭ヽMSE・峨ｒ陦後≧繝・・繝ｫ鄒､縺ｧ縺吶よ耳螂ｨ繝輔Ο繝ｼ縺ｯ PDD 繧堤畑縺・◆逵溷､繧ｹ繧ｱ繝ｼ繝ｪ繝ｳ繧ｰ縺ｫ繧医ｋ OCR 豈碑ｼ・〒縺吶・
@@ -70,5 +70,6 @@ MIT License
 ### Windows 用実行ファイル（EXE）
 - GitHub Releases に `ocr_true_scaling.exe` を添付（タグ作成/リリース時に自動ビルド）
 - ダウンロード後、コマンドプロンプトで `ocr_true_scaling.exe --help` を実行
+- 最新版: https://github.com/inata169/phits-linac-validation/releases/latest
 
 
