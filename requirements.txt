@@ -6,3 +6,4 @@ pymedphys
 pytest
 numba
 llvmlite
+interpolation
