@@ -19,6 +19,9 @@ temp/*
 !temp/.gitkeep
 config.ini
 data/phits_output/
+dist/
+build/
+*.spec
 .ipynb_checkpoints/
 notebooks/.ipynb_checkpoints/
 
