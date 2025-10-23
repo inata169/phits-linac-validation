@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ${{ matrix.os }}
+    env:
+      MPLBACKEND: Agg
+      PYTHONIOENCODING: utf-8
     strategy:
       fail-fast: false
       matrix:
