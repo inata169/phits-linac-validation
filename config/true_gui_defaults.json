@@ -21,8 +21,8 @@
     "export_gamma":  true,
     "legend_ref":  "Measured",
     "legend_eval":  "PHITS",
-    "last_ref_pdd_dir":  "C:\\Users\\放射治療研究用PC\\Documents\\Python\\phits-linac-validation\\tests\\data\\measured_csv",
-    "last_eval_pdd_dir":  "C:\\Users\\放射治療研究用PC\\Documents\\Python\\phits-linac-validation\\tests\\data\\PHITS",
-    "last_ref_ocr_dir":  "C:\\Users\\放射治療研究用PC\\Documents\\Python\\phits-linac-validation\\tests\\data\\measured_csv",
-    "last_eval_ocr_dir":  "C:\\Users\\放射治療研究用PC\\Documents\\Python\\phits-linac-validation\\tests\\data\\PHITS"
+    "last_ref_pdd_dir":  "",
+    "last_eval_pdd_dir":  "",
+    "last_ref_ocr_dir":  "",
+    "last_eval_ocr_dir":  ""
 }

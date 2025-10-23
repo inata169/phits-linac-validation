@@ -2,8 +2,10 @@ pandas
 numpy
 matplotlib
 scipy
-pymedphys
 pytest
-numba
-llvmlite
-interpolation
+
+# Gamma and its dependencies (pinned for CI stability)
+pymedphys==0.41.*
+numba~=0.59
+llvmlite~=0.42
+interpolation~=2.2

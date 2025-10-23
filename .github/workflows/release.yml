@@ -32,6 +32,21 @@ jobs:
           $exe = Get-ChildItem -Recurse -Filter "ocr_true_scaling*.exe" dist | Select-Object -First 1
           if (-not $exe) { Write-Error "EXE not found under dist/"; exit 1 }
           echo "exe_path=$($exe.FullName)" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+      - name: Prepare artifacts (rename + SHA256)
+        id: prep
+        shell: pwsh
+        run: |
+          $version = '${{ github.ref_name }}'
+          $name = "ocr_true_scaling-$version-windows-x64.exe"
+          $outDir = Join-Path (Get-Location) 'dist/release'
+          New-Item -ItemType Directory -Force -Path $outDir | Out-Null
+          $dst = Join-Path $outDir $name
+          Copy-Item -Force "${{ steps.find_exe.outputs.exe_path }}" $dst
+          $hash = (Get-FileHash -Algorithm SHA256 $dst).Hash
+          $hashFile = Join-Path $outDir ($name + '.sha256')
+          "$hash *$name" | Out-File -FilePath $hashFile -Encoding ASCII
+          echo "artifact=$dst" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
+          echo "sha256=$hashFile" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
       - name: Determine release notes file
         id: notes
         shell: pwsh
@@ -48,7 +63,8 @@ jobs:
           name: Release ${{ github.ref_name }}
           body_path: ${{ steps.notes.outputs.notes_path }}
           files: |
-            ${{ steps.find_exe.outputs.exe_path }}
+            ${{ steps.prep.outputs.artifact }}
+            ${{ steps.prep.outputs.sha256 }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload to Release (auto notes)
@@ -59,6 +75,7 @@ jobs:
           name: Release ${{ github.ref_name }}
           generate_release_notes: true
           files: |
-            ${{ steps.find_exe.outputs.exe_path }}
+            ${{ steps.prep.outputs.artifact }}
+            ${{ steps.prep.outputs.sha256 }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
