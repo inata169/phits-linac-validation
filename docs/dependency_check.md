@@ -1,6 +1,6 @@
-# 依存関係チェックとインストール
+﻿# 依存関係チェックとインストール
 
-## 必須バージョン/パッケージ
+## 必要バージョン/パッケージ
 - Python: `>=3.9`
 - パッケージ: `pandas`, `numpy`, `matplotlib`, `scipy`, `pymedphys`
 
@@ -8,15 +8,14 @@
 ```
 python scripts/check_deps.py
 ```
-- インストール漏れやバージョン不一致を検出します。
+- インストール漏れやバージョン不一致をチェックします。
 
-## 仮想環境（例: Windows PowerShell）
+## 仮想環境（Windows PowerShell）
 ```
 python -m venv .venv
 .\.venv\Scripts\Activate
 pip install -U pip
-pip install pandas numpy matplotlib scipy pymedphys
+pip install -r requirements.txt
 ```
 
-※ ネットワーク制限環境では上記コマンドのみ提示し、ツール側で自動実行はしません。
-
+※ ネットワーク制限環境では上記コマンドのみ提示し、ツール側で自動実行しません。
