@@ -2,6 +2,14 @@ Changelog
 
 All notable changes to this project are documented here.
 
+v0.2.2 - 2025-10-23
+
+- Docs: README/examples/dependency_check をUTF-8日本語で整備、SHA256検証手順を追記。
+- CI: Windows/Ubuntu 安定化（pip cache path, prefer-binary, PIP_DISABLE_PIP_VERSION_CHECK）。
+- CI: Python 3.9 で `pymedphys==0.40.*`、>=3.10 で `0.41.*` を利用するよう環境マーカーを導入。
+- Release: EXE を -V でスモーク実行、バージョン付きファイル名と SHA256 を添付、.ps1 をASCII安全化。
+- Release: タグ名と `__version__` の整合をワークフローで検証。
+
 v0.2.1 - 2025-10-23
 
 - CLI: add `-V/--version` (reports tool version; 0.2.1).

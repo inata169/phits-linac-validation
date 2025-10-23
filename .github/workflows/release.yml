@@ -12,6 +12,21 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Check tag matches __version__
+        shell: pwsh
+        run: |
+          $tag = $env:GITHUB_REF_NAME
+          if (-not $tag) { Write-Error 'GITHUB_REF_NAME is empty'; exit 1 }
+          if ($tag.StartsWith('v')) { $tag = $tag.Substring(1) }
+          $path = 'src/ocr_true_scaling.py'
+          if (-not (Test-Path $path)) { Write-Error "Missing $path"; exit 1 }
+          $content = Get-Content -Raw -Path $path -Encoding UTF8
+          $m = [regex]::Match($content, '__version__\s*=\s*"([0-9]+\.[0-9]+\.[0-9]+)"')
+          if (-not $m.Success) { Write-Error 'Could not parse __version__'; exit 1 }
+          $ver = $m.Groups[1].Value
+          if ($ver -ne $tag) {
+            Write-Error "Tag ($env:GITHUB_REF_NAME) does not match __version__ ($ver)"; exit 1
+          }
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'

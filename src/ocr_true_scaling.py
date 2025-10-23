@@ -9,7 +9,7 @@ from typing import Tuple, Optional
 import numpy as np
 import pandas as pd
 
-__version__ = "0.2.1"
+__version__ = "0.2.2"
 
 # Allow skipping heavy optional imports for fast version/help checks
 _SKIP_IMPORTS = os.environ.get("OCR_TS_SKIP_IMPORTS") == "1"
