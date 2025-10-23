@@ -16,6 +16,16 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Read release title (title.txt) if present
+        id: meta
+        shell: pwsh
+        run: |
+          $title = "Release $env:GITHUB_REF_NAME"
+          if (Test-Path 'title.txt') {
+            $t = Get-Content -Raw -Path 'title.txt' -Encoding UTF8
+            if ($t) { $title = ($t -split "\r?\n")[0] }
+          }
+          echo "rel_title=$title" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
       - name: Check tag matches __version__
         shell: pwsh
         run: |
@@ -72,21 +82,21 @@ jobs:
           "$hash *$name" | Out-File -FilePath $hashFile -Encoding ASCII
           echo "artifact=$dst" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
           echo "sha256=$hashFile" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-      - name: Determine release notes file
+      - name: Determine release notes file (prefer release-note.md)
         id: notes
         shell: pwsh
         run: |
-          $name = "RELEASE_NOTES_${{ github.ref_name }}.md"
-          if (Test-Path $name) {
-            echo "notes_path=$name" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append
-          }
+          $notes = ''
+          if (Test-Path 'release-note.md') { $notes = 'release-note.md' }
+          elseif (Test-Path "RELEASE_NOTES_${{ github.ref_name }}.md") { $notes = "RELEASE_NOTES_${{ github.ref_name }}.md" }
+          if ($notes) { echo "notes_path=$notes" | Out-File -FilePath $Env:GITHUB_OUTPUT -Encoding utf8 -Append }
       # Prefer a fine-grained PAT if provided (repo secret: GH_RELEASE_TOKEN)
       - name: Upload to Release (with notes, PAT)
         if: steps.notes.outputs.notes_path != '' && secrets.GH_RELEASE_TOKEN != ''
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          name: ${{ steps.meta.outputs.rel_title }}
           body_path: ${{ steps.notes.outputs.notes_path }}
           files: |
             ${{ steps.prep.outputs.artifact }}
@@ -97,7 +107,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          name: ${{ steps.meta.outputs.rel_title }}
           generate_release_notes: true
           files: |
             ${{ steps.prep.outputs.artifact }}
@@ -110,7 +120,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          name: ${{ steps.meta.outputs.rel_title }}
           body_path: ${{ steps.notes.outputs.notes_path }}
           files: |
             ${{ steps.prep.outputs.artifact }}
@@ -122,7 +132,7 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          name: ${{ steps.meta.outputs.rel_title }}
           generate_release_notes: true
           files: |
             ${{ steps.prep.outputs.artifact }}
