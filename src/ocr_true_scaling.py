@@ -9,6 +9,8 @@ from typing import Tuple, Optional
 import numpy as np
 import pandas as pd
 
+__version__ = "0.2.1"
+
 try:
     import matplotlib.pyplot as plt
     from scipy.signal import savgol_filter
@@ -170,6 +172,7 @@ def compute_gamma(x_ref_cm, y_ref, x_eval_cm, y_eval, dd, dta, cutoff, mode: str
 
 def main():
     ap = argparse.ArgumentParser(description='True-scaling OCR comparison (PDD-weighted)')
+    ap.add_argument('-V', '--version', action='version', version=f'%(prog)s {__version__}')
     ap.add_argument('--ref-pdd-type', choices=['csv', 'phits'], required=True)
     ap.add_argument('--ref-pdd-file', required=True)
     ap.add_argument('--eval-pdd-type', choices=['csv', 'phits'], required=True)
