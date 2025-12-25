@@ -207,6 +207,8 @@ def main():
     ap.add_argument('--center-tol-cm', type=float, default=0.05)
     ap.add_argument('--center-interp', action='store_true')
     ap.add_argument('--fwhm-warn-cm', type=float, default=1.0)
+    ap.add_argument('--eval-z-shift', type=float, default=0.0)
+    ap.add_argument('--eval-pdd-z-shift', type=float, default=0.0)
     ap.add_argument('--output-dir', type=str, default=None)
     ap.add_argument('--no-pdd-report', action='store_true')
     args = ap.parse_args()
@@ -236,6 +238,7 @@ def main():
         z_eval_pos, z_eval_dose = load_csv_profile(args.eval_pdd_file)
     else:
         _, z_eval_pos, z_eval_dose, _ = parse_phits_out_profile(args.eval_pdd_file)
+    z_eval_pos = z_eval_pos + args.eval_pdd_z_shift
     z_eval_pos, z_eval_norm = normalize_pdd(z_eval_pos, z_eval_dose, args.norm_mode, args.z_ref)
 
     # OCR load & center-normalise
@@ -295,6 +298,9 @@ def main():
             except Exception:
                 pass
         x_eval, ocr_eval = pos, dose
+        z_depth_eval = z_depth_eval + args.eval_z_shift
+        if axis == 'z':
+            x_eval = x_eval + args.eval_z_shift
     x_eval, ocr_eval_rel = center_normalise(x_eval, ocr_eval, tol_cm=args.center_tol_cm, interp=args.center_interp)
 
     # Optional smoothing (renormalise to peak=1 afterwards)
@@ -450,6 +456,8 @@ def main():
         f.write(f"norm-mode: {args.norm_mode}, z_ref: {args.z_ref} cm\n")
         f.write(f"gamma-mode: {args.gamma_mode}\n")
         f.write(f"ref depth (cm): {z_depth_ref:.6f}, eval depth (cm): {z_depth_eval:.6f}\n")
+        if args.eval_z_shift != 0 or args.eval_pdd_z_shift != 0:
+            f.write(f"eval-z-shift: {args.eval_z_shift} cm, eval-pdd-z-shift: {args.eval_pdd_z_shift} cm\n")
         f.write(f"S_axis(ref): {s_axis_ref:.6f}, S_axis(eval): {s_axis_eval:.6f}\n")
         f.write(f"grid (cm): {grid_step:.6f}\n")
         f.write('\n## Results\n')
@@ -490,6 +498,8 @@ def main():
                 '--smooth-window', str(args.smooth_window),
                 '--smooth-order', str(args.smooth_order),
                 '--center-tol-cm', str(args.center_tol_cm),
+                '--eval-z-shift', str(args.eval_z_shift),
+                '--eval-pdd-z-shift', str(args.eval_pdd_z_shift),
             ]
             if args.center_interp:
                 argv.append('--center-interp')
@@ -553,6 +563,8 @@ def main():
                 'smooth_window': int(args.smooth_window),
                 'smooth_order': int(args.smooth_order),
                 'fwhm_warn_cm': float(args.fwhm_warn_cm),
+                'eval_z_shift': float(args.eval_z_shift),
+                'eval_pdd_z_shift': float(args.eval_pdd_z_shift),
             },
             'derived': {
                 'ref_depth_cm': _float(z_depth_ref),
@@ -645,6 +657,8 @@ def main():
                     '--smooth-window', str(args.smooth_window),
                     '--smooth-order', str(args.smooth_order),
                     '--center-tol-cm', str(args.center_tol_cm),
+                    '--eval-z-shift', str(args.eval_z_shift),
+                    '--eval-pdd-z-shift', str(args.eval_pdd_z_shift),
                 ]
                 if args.center_interp:
                     argv.append('--center-interp')

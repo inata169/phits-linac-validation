@@ -14,6 +14,7 @@ PHITS の出力（`.out`）と実測 CSV を読み込み、線量プロファイ
 - OCR の中心正規化、任意の平滑化（Savitzky–Golay）
 - PDD による重み付け（真値スケーリング）で物理的に妥当な比較
 - ガンマ（2%/2mm, 3%/3mm）と RMSE の評価、グローバル/ローカル切替
+- 座標系補正: PHITS データの Z 軸オフセット（`--eval-z-shift`, `--eval-pdd-z-shift`）
 - 図・レポート・CSV（真値/再サンプル/γ）および JSON レポートの出力
 
 詳細仕様は `docs/openspec.md` を参照してください（実装 v0.2.1 と整合）。
@@ -39,6 +40,17 @@ python src/ocr_true_scaling.py \
   --norm-mode dmax --gamma-mode global --cutoff 10 \
   --fwhm-warn-cm 1.0 --export-csv --export-gamma \
   --output-dir output --report-json output/data/true_report.json
+
+4) 例（座標系補正あり：PHITS の Z 座標を +5 cm シフト）
+```
+python src/ocr_true_scaling.py \
+  --ref-pdd-type csv   --ref-pdd-file data/measured_csv/10x10mPDD-zZver.csv \
+  --eval-pdd-type phits --eval-pdd-file phits_output/deposit-pdd.out \
+  --ref-ocr-type csv    --ref-ocr-file data/measured_csv/10x10m10cm-xXlat.csv \
+  --eval-ocr-type phits  --eval-ocr-file phits_output/deposit-z-water-100x.out \
+  --eval-z-shift 5.0 --eval-pdd-z-shift 5.0 \
+  --norm-mode dmax --output-dir output
+```
 ```
 
 実行レシピは `docs/examples.md` も参照してください。
@@ -55,6 +67,7 @@ python src/ocr_true_scaling.py \
 
 ## トラブルシューティング（GPRが低い等）
 - 深さ: レポートの `ref depth / eval depth` と `S_axis(ref/eval)` を確認（一致が前提）
+  - PHITS の座標定義（水表面位置）が実測と異なる場合、`--eval-z-shift 5.0` 等で補正可能
 - 幅: FWHM(ref/eval) を確認（5×5:±0.5 cm、10×10:±1.0 cm、30×30:±2.0 cm 目安）
 - 中心正規化: 原点近傍サンプル不足時は `--center-interp` や `--center-tol-cm` 調整
 - 平滑化: `--no-smooth` または軽め（`--smooth-window 11 --smooth-order 3`）
