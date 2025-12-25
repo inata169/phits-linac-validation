@@ -6,7 +6,7 @@
 #### Scenario: Mixed source comparison
 - Given reference PDD+OCR from CSV and eval PDD+OCR from PHITS
 - When true scaling is requested
-- Then the tool constructs True(x,z) for both and compares γ/RMSE.
+- Then the tool constructs True(x,z) for both and compares gamma/RMSE.
 
 #### Requirement: Normalized units
 - Positions MUST be treated as cm at the I/O boundary.

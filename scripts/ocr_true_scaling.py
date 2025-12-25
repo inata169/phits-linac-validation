@@ -1,0 +1,745 @@
+import argparse
+import json
+import os
+import re
+import sys
+import configparser
+from typing import Tuple, Optional
+
+import numpy as np
+import pandas as pd
+
+__version__ = "0.2.2"
+
+# Allow skipping heavy optional imports for fast version/help checks
+_SKIP_IMPORTS = os.environ.get("OCR_TS_SKIP_IMPORTS") == "1"
+if not _SKIP_IMPORTS:
+    try:
+        import matplotlib.pyplot as plt  # type: ignore
+        from scipy.signal import savgol_filter  # type: ignore
+        import pymedphys  # type: ignore
+    except ModuleNotFoundError as e:
+        print(
+            "Missing dependencies: "
+            + str(e)
+            + ". Please install: pip install pandas numpy matplotlib scipy pymedphys",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+
+
+def load_csv_profile(path: str) -> Tuple[np.ndarray, np.ndarray]:
+    # Robust CSV loader: try standard CSV, then fallback to whitespace-delimited
+    try:
+        df0 = pd.read_csv(path, encoding="utf-8-sig", header=None)
+    except Exception:
+        df0 = pd.read_csv(path, encoding="utf-8-sig", header=None, delim_whitespace=True)
+    if df0.shape[1] >= 2 and isinstance(df0.iloc[0, 0], str) and "(cm)" in str(df0.iloc[0, 0]):
+        df = pd.read_csv(path, encoding="utf-8-sig")
+        cols = list(df.columns)[:2]
+        df = df[cols]
+        df.columns = ["pos", "dose"]
+    else:
+        df = df0.iloc[:, :2]
+        df.columns = ["pos", "dose"]
+    pos = pd.to_numeric(df["pos"], errors="coerce").to_numpy()
+    dose = pd.to_numeric(df["dose"], errors="coerce").to_numpy()
+    m = np.isfinite(pos) & np.isfinite(dose)
+    pos = pos[m]
+    dose = dose[m]
+    order = np.argsort(pos)
+    pos = pos[order]
+    dose = dose[order]
+    if dose.size == 0:
+        raise ValueError(f"CSV has no valid numeric data: {path}")
+    dmax = float(np.max(dose))
+    if dmax <= 0:
+        raise ValueError(f"CSV dose max <= 0: {path}")
+    return pos.astype(float), (dose / dmax).astype(float)
+
+
+def parse_phits_out_profile(path: str) -> Tuple[str, np.ndarray, np.ndarray, dict]:
+    with open(path, "r", encoding="utf-8", errors="ignore") as f:
+        lines = f.readlines()
+    axis = None
+    y_center = None
+    for line in lines:
+        s = line.strip().lower().replace(" ", "")
+        if s.startswith("axis="):
+            axis = line.split("=")[1].strip().split("#")[0].strip()
+        if re.search(r"^\s*#\s*y\s*=\s*\(", line, flags=re.IGNORECASE):
+            nums = re.findall(r"([\-\+\d\.Ee]+)", line)
+            if len(nums) >= 2:
+                try:
+                    y0 = float(nums[0]); y1 = float(nums[1])
+                    y_center = 0.5 * (y0 + y1)
+                except Exception:
+                    pass
+    data_start = None
+    for i, line in enumerate(lines):
+        t = line.strip().lower()
+        if t.startswith("#  y-lower") or t.startswith("#  z-lower") or t.startswith("#  x-lower"):
+            data_start = i + 1
+            break
+    if data_start is None:
+        raise ValueError(f"Could not find PHITS data table header: {path}")
+    pos_centers, vals = [], []
+    for line in lines[data_start:]:
+        s = line.strip()
+        if not s or s.startswith("#"):
+            break
+        parts = s.split()
+        if len(parts) < 3:
+            continue
+        try:
+            lo = float(parts[0]); hi = float(parts[1]); v = float(parts[2])
+        except Exception:
+            continue
+        pos_centers.append(0.5 * (lo + hi))
+        vals.append(v)
+    pos = np.asarray(pos_centers, float)
+    dose = np.asarray(vals, float)
+    if dose.size == 0:
+        raise ValueError(f"PHITS data is empty: {path}")
+    dmax = float(np.max(dose))
+    if dmax <= 0:
+        raise ValueError(f"PHITS dose max <= 0: {path}")
+    meta = {}
+    if y_center is not None:
+        meta["y_center_cm"] = y_center
+    return axis or "", pos, (dose / dmax), meta
+
+
+def _extract_depth_cm_from_phits_filename(path: str) -> Optional[float]:
+    try:
+        base = os.path.basename(path)
+        # match ...-200z.out or ...-200x.out or ...-200.out
+        m = re.search(r"-(\d+)([a-z])?\.out$", base, flags=re.IGNORECASE)
+        if not m:
+            return None
+        mm = float(m.group(1))
+        return mm / 10.0
+    except Exception:
+        return None
+
+
+def normalize_pdd(pos_cm: np.ndarray, dose_norm: np.ndarray, mode: str, z_ref_cm: float):
+    if mode == "z_ref":
+        ref = float(np.interp(z_ref_cm, pos_cm, dose_norm))
+        if ref <= 0:
+            raise ValueError(f"PDD at z_ref={z_ref_cm} cm <= 0, cannot normalise")
+        return pos_cm, (dose_norm / ref)
+    dmax = float(np.max(dose_norm))
+    return pos_cm, (dose_norm / dmax)
+
+
+def center_normalise(pos_cm: np.ndarray, dose: np.ndarray, tol_cm: float, interp: bool):
+    if pos_cm.size == 0:
+        return pos_cm, dose
+    idx = int(np.argmin(np.abs(pos_cm)))
+    x0 = float(pos_cm[idx])
+    pos = pos_cm - x0
+    if abs(x0) <= tol_cm:
+        c = float(dose[idx])
+    else:
+        c = None
+        if interp and pos_cm.size >= 2:
+            for i in range(1, len(pos_cm)):
+                xa, xb = float(pos_cm[i - 1]), float(pos_cm[i])
+                ya, yb = float(dose[i - 1]), float(dose[i])
+                if (xa <= 0.0 <= xb) or (xb <= 0.0 <= xa):
+                    c = float(ya + (0.0 - xa) * (yb - ya) / (xb - xa)) if xb != xa else float(ya)
+                    break
+        if c is None:
+            c = float(np.max(dose)) if dose.size else 1.0
+    if c <= 0:
+        raise ValueError("Center normalisation base <= 0")
+    return pos, (dose / c)
+
+
+def compute_gamma(x_ref_cm, y_ref, x_eval_cm, y_eval, dd, dta, cutoff, mode: str):
+    if np.max(y_ref) <= 0:
+        return 0.0
+    global_norm = float(np.max(y_ref))
+    g = pymedphys.gamma(
+        axes_reference=(x_ref_cm * 10.0,), dose_reference=y_ref,
+        axes_evaluation=(x_eval_cm * 10.0,), dose_evaluation=y_eval,
+        dose_percent_threshold=dd, distance_mm_threshold=dta,
+        lower_percent_dose_cutoff=cutoff,
+        local_gamma=(mode == 'local'),
+        global_normalisation=global_norm,
+    )
+    v = g[~np.isnan(g)]
+    return float(np.sum(v <= 1.0) / v.size * 100.0) if v.size else 0.0
+
+
+def main():
+    ap = argparse.ArgumentParser(description='True-scaling OCR comparison (PDD-weighted)')
+    ap.add_argument('-V', '--version', action='version', version=f'%(prog)s {__version__}')
+    ap.add_argument('--ref-pdd-type', choices=['csv', 'phits'], required=True)
+    ap.add_argument('--ref-pdd-file', required=True)
+    ap.add_argument('--eval-pdd-type', choices=['csv', 'phits'], required=True)
+    ap.add_argument('--eval-pdd-file', required=True)
+    ap.add_argument('--ref-ocr-type', choices=['csv', 'phits'], required=True)
+    ap.add_argument('--ref-ocr-file', required=True)
+    ap.add_argument('--eval-ocr-type', choices=['csv', 'phits'], required=True)
+    ap.add_argument('--eval-ocr-file', required=True)
+    ap.add_argument('--norm-mode', choices=['dmax', 'z_ref'], default='dmax')
+    ap.add_argument('--z-ref', type=float, default=10.0)
+    ap.add_argument('--dd1', type=float, default=2.0)
+    ap.add_argument('--dta1', type=float, default=2.0)
+    ap.add_argument('--dd2', type=float, default=3.0)
+    ap.add_argument('--dta2', type=float, default=3.0)
+    ap.add_argument('--gamma-mode', choices=['global', 'local'], default='global')
+    ap.add_argument('--cutoff', type=float, default=10.0)
+    ap.add_argument('--smooth-window', type=int, default=5)
+    ap.add_argument('--smooth-order', type=int, default=2)
+    ap.add_argument('--no-smooth', action='store_true')
+    ap.add_argument('--grid', type=float, default=None)
+    ap.add_argument('--ymin', type=float, default=None)
+    ap.add_argument('--ymax', type=float, default=None)
+    ap.add_argument('--export-csv', action='store_true')
+    ap.add_argument('--export-gamma', action='store_true')
+    ap.add_argument('--report-json', type=str, default=None)
+    ap.add_argument('--xlim-symmetric', action='store_true')
+    ap.add_argument('--legend-ref', type=str, default=None)
+    ap.add_argument('--legend-eval', type=str, default=None)
+    ap.add_argument('--center-tol-cm', type=float, default=0.05)
+    ap.add_argument('--center-interp', action='store_true')
+    ap.add_argument('--fwhm-warn-cm', type=float, default=1.0)
+    ap.add_argument('--eval-z-shift', type=float, default=0.0)
+    ap.add_argument('--eval-pdd-z-shift', type=float, default=0.0)
+    ap.add_argument('--output-dir', type=str, default=None)
+    ap.add_argument('--no-pdd-report', action='store_true')
+    args = ap.parse_args()
+
+    # PDD load & normalise (auto-correct types for convenience)
+    ref_pdd_type = args.ref_pdd_type
+    if ref_pdd_type == 'csv' and os.path.basename(args.ref_pdd_file).lower().endswith('.out'):
+        try:
+            print(f"警告: ref PDD が .out のため CSV→PHITS に自動切替: {args.ref_pdd_file}", file=sys.stderr)
+        except Exception:
+            pass
+        ref_pdd_type = 'phits'
+    if ref_pdd_type == 'csv':
+        z_ref_pos, z_ref_dose = load_csv_profile(args.ref_pdd_file)
+    else:
+        _, z_ref_pos, z_ref_dose, _ = parse_phits_out_profile(args.ref_pdd_file)
+    z_ref_pos, z_ref_norm = normalize_pdd(z_ref_pos, z_ref_dose, args.norm_mode, args.z_ref)
+
+    eval_pdd_type = args.eval_pdd_type
+    if eval_pdd_type == 'csv' and os.path.basename(args.eval_pdd_file).lower().endswith('.out'):
+        try:
+            print(f"警告: eval PDD が .out のため CSV→PHITS に自動切替: {args.eval_pdd_file}", file=sys.stderr)
+        except Exception:
+            pass
+        eval_pdd_type = 'phits'
+    if eval_pdd_type == 'csv':
+        z_eval_pos, z_eval_dose = load_csv_profile(args.eval_pdd_file)
+    else:
+        _, z_eval_pos, z_eval_dose, _ = parse_phits_out_profile(args.eval_pdd_file)
+    z_eval_pos = z_eval_pos + args.eval_pdd_z_shift
+    z_eval_pos, z_eval_norm = normalize_pdd(z_eval_pos, z_eval_dose, args.norm_mode, args.z_ref)
+
+    # OCR load & center-normalise
+    def _guess_type(p: str) -> str:
+        b = os.path.basename(p).lower()
+        if b.endswith('.out') or b.endswith('.eps'):
+            return 'phits'
+        if b.endswith('.csv'):
+            return 'csv'
+        return 'csv'
+
+    ref_ocr_type = args.ref_ocr_type
+    if ref_ocr_type == 'csv' and _guess_type(args.ref_ocr_file) == 'phits':
+        try:
+            print(f"警告: ref OCR が .out のため CSV→PHITS に自動切替: {args.ref_ocr_file}", file=sys.stderr)
+        except Exception:
+            pass
+        ref_ocr_type = 'phits'
+    if ref_ocr_type == 'csv':
+        x_ref, ocr_ref = load_csv_profile(args.ref_ocr_file)
+        m = re.search(r"([0-9]+(?:\.[0-9]+)?)\s*cm", os.path.basename(args.ref_ocr_file), re.IGNORECASE)
+        z_depth_ref = float(m.group(1)) if m else args.z_ref
+    else:
+        axis, pos, dose, meta = parse_phits_out_profile(args.ref_ocr_file)
+        z_depth_ref = meta.get('y_center_cm', None)
+        if z_depth_ref is None:
+            z_depth_ref = _extract_depth_cm_from_phits_filename(args.ref_ocr_file)
+        if z_depth_ref is None:
+            z_depth_ref = args.z_ref
+            try:
+                print(f"警告: PHITS OCR(ref) の深さをヘッダ/ファイル名から取得できず z_ref={args.z_ref} cm を使用", file=sys.stderr)
+            except Exception:
+                pass
+        x_ref, ocr_ref = pos, dose
+    x_ref, ocr_ref_rel = center_normalise(x_ref, ocr_ref, tol_cm=args.center_tol_cm, interp=args.center_interp)
+
+    eval_ocr_type = args.eval_ocr_type
+    if eval_ocr_type == 'csv' and _guess_type(args.eval_ocr_file) == 'phits':
+        try:
+            print(f"警告: eval OCR が .out のため CSV→PHITS に自動切替: {args.eval_ocr_file}", file=sys.stderr)
+        except Exception:
+            pass
+        eval_ocr_type = 'phits'
+    if eval_ocr_type == 'csv':
+        x_eval, ocr_eval = load_csv_profile(args.eval_ocr_file)
+        m = re.search(r"([0-9]+(?:\.[0-9]+)?)\s*cm", os.path.basename(args.eval_ocr_file), re.IGNORECASE)
+        z_depth_eval = float(m.group(1)) if m else args.z_ref
+    else:
+        axis, pos, dose, meta = parse_phits_out_profile(args.eval_ocr_file)
+        z_depth_eval = meta.get('y_center_cm', None)
+        if z_depth_eval is None:
+            z_depth_eval = _extract_depth_cm_from_phits_filename(args.eval_ocr_file)
+        if z_depth_eval is None:
+            z_depth_eval = args.z_ref
+            try:
+                print(f"警告: PHITS OCR(eval) の深さをヘッダ/ファイル名から取得できず z_ref={args.z_ref} cm を使用", file=sys.stderr)
+            except Exception:
+                pass
+        x_eval, ocr_eval = pos, dose
+        z_depth_eval = z_depth_eval + args.eval_z_shift
+        if axis == 'z':
+            x_eval = x_eval + args.eval_z_shift
+    x_eval, ocr_eval_rel = center_normalise(x_eval, ocr_eval, tol_cm=args.center_tol_cm, interp=args.center_interp)
+
+    # Optional smoothing (renormalise to peak=1 afterwards)
+    if not args.no_smooth:
+        try:
+            w = args.smooth_window if args.smooth_window % 2 == 1 else args.smooth_window + 1
+            o = args.smooth_order
+            if w > o and len(ocr_ref_rel) >= w:
+                ocr_ref_rel = savgol_filter(ocr_ref_rel, w, o)
+            if w > o and len(ocr_eval_rel) >= w:
+                ocr_eval_rel = savgol_filter(ocr_eval_rel, w, o)
+            if np.max(ocr_ref_rel) > 0:
+                ocr_ref_rel = ocr_ref_rel / np.max(ocr_ref_rel)
+            if np.max(ocr_eval_rel) > 0:
+                ocr_eval_rel = ocr_eval_rel / np.max(ocr_eval_rel)
+        except Exception:
+            pass
+
+    # True series
+    s_axis_ref = float(np.interp(z_depth_ref, z_ref_pos, z_ref_norm))
+    s_axis_eval = float(np.interp(z_depth_eval, z_eval_pos, z_eval_norm))
+    y_true_ref = s_axis_ref * ocr_ref_rel
+    y_true_eval = s_axis_eval * ocr_eval_rel
+
+    # RMSE and gamma
+    grid_step = args.grid
+    if grid_step is None:
+        cfg = configparser.ConfigParser()
+        prj_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        cfg_path = os.path.join(prj_root, 'config.ini')
+        if os.path.exists(cfg_path):
+            try:
+                cfg.read(cfg_path, encoding='utf-8')
+                grid_step = float(cfg.get('Processing', 'resample_grid_cm', fallback='0.1'))
+            except Exception:
+                grid_step = 0.1
+        else:
+            grid_step = 0.1
+
+    def resample(x1, y1, x2, y2, step):
+        if not step or step <= 0:
+            return None, None, None
+        xmin = max(np.min(x1), np.min(x2)); xmax = min(np.max(x1), np.max(x2))
+        if xmax - xmin <= step * 2:
+            return None, None, None
+        n = int(np.floor((xmax - xmin) / step)) + 1
+        grid = xmin + np.arange(n + 1) * step
+        return grid, np.interp(grid, x1, y1), np.interp(grid, x2, y2)
+
+    grid, y_ref_g, y_eval_g = resample(x_ref, y_true_ref, x_eval, y_true_eval, grid_step)
+    if grid is not None:
+        rmse = float(np.sqrt(np.mean((y_ref_g - y_eval_g) ** 2)))
+        xr, yr = grid, y_ref_g
+        xe, ye = grid, y_eval_g
+    else:
+        rmse = float(np.sqrt(np.mean((np.interp(x_ref, x_eval, y_true_eval) - y_true_ref) ** 2)))
+        xr, yr = x_ref, y_true_ref
+        xe, ye = x_eval, y_true_eval
+
+    g1 = compute_gamma(xr, yr, xe, ye, args.dd1, args.dta1, args.cutoff, args.gamma_mode)
+    g2 = compute_gamma(xr, yr, xe, ye, args.dd2, args.dta2, args.cutoff, args.gamma_mode)
+    print("RMSE: {:.6f}".format(rmse))
+    print("Gamma pass (DD={:.1f}%, DTA={:.1f}mm, Cutoff={:.1f}%): {:.2f}%".format(args.dd1, args.dta1, args.cutoff, g1))
+    print("Gamma pass (DD={:.1f}%, DTA={:.1f}mm, Cutoff={:.1f}%): {:.2f}%".format(args.dd2, args.dta2, args.cutoff, g2))
+
+    # FWHM check
+    def fwhm(x, y):
+        if x.size < 3:
+            return None
+        i = int(np.argmax(y)); peak = float(y[i])
+        if peak <= 0:
+            return None
+        half = 0.5 * peak
+        L = None
+        for k in range(i, 0, -1):
+            y0, y1 = y[k - 1], y[k]
+            if (y0 <= half <= y1) or (y1 <= half <= y0):
+                x0, x1 = x[k - 1], x[k]
+                L = float(x0 if y1 == y0 else x0 + (half - y0) * (x1 - x0) / (y1 - y0))
+                break
+        R = None
+        for k in range(i, len(x) - 1):
+            y0, y1 = y[k], y[k + 1]
+            if (y0 <= half <= y1) or (y1 <= half <= y0):
+                x0, x1 = x[k], x[k + 1]
+                R = float(x1 if y1 == y0 else x0 + (half - y0) * (x1 - x0) / (y1 - y0))
+                break
+        return None if (L is None or R is None) else float(abs(R - L))
+
+    f1 = fwhm(x_ref, ocr_ref_rel); f2 = fwhm(x_eval, ocr_eval_rel)
+    f_delta = None
+    if f1 is not None and f2 is not None:
+        f_delta = f2 - f1
+        if abs(f_delta) > float(args.fwhm_warn_cm):
+            print(
+                "Warning: FWHM mismatch |delta|={:.3f} cm (> {:.3f} cm). ref={:.3f} cm, eval={:.3f} cm".format(
+                    abs(f_delta), float(args.fwhm_warn_cm), f1, f2
+                ),
+                file=sys.stderr,
+            )
+
+    # Outputs
+    prj_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    out_root = args.output_dir or os.path.join(prj_root, 'output')
+    plot_dir = os.path.join(out_root, 'plots')
+    report_dir = os.path.join(out_root, 'reports')
+    data_dir = os.path.join(out_root, 'data')
+    os.makedirs(plot_dir, exist_ok=True)
+    os.makedirs(report_dir, exist_ok=True)
+    os.makedirs(data_dir, exist_ok=True)
+
+    ref_base = os.path.splitext(os.path.basename(args.ref_ocr_file))[0]
+    eval_base = os.path.splitext(os.path.basename(args.eval_ocr_file))[0]
+    title = (
+        "True-scaling (PDD-weighted) [gamma: {}]\n".format(args.gamma_mode)
+        + "norm={}, z_ref={} cm / ref_z={:.3f} cm, eval_z={:.3f} cm".format(
+            args.norm_mode, args.z_ref, z_depth_ref, z_depth_eval
+        )
+    )
+    try:
+        import matplotlib as _mpl
+        _mpl.rcParams['font.family'] = ['DejaVu Sans', 'Arial']
+        _mpl.rcParams['axes.unicode_minus'] = False
+    except Exception:
+        pass
+
+    plt.figure(figsize=(12, 8))
+    plt.plot(x_ref, y_true_ref, label=args.legend_ref or 'Reference')
+    plt.plot(x_eval, y_true_eval, label=args.legend_eval or 'Evaluation')
+    plt.title(title)
+    plt.xlabel('x (cm)')
+    plt.ylabel('True dose (a.u.)')
+    plt.grid(True, alpha=0.3)
+    if args.ymin is not None or args.ymax is not None:
+        plt.ylim(args.ymin, args.ymax)
+    if args.xlim_symmetric:
+        xmax = max(abs(np.min(x_ref)), abs(np.max(x_ref)), abs(np.min(x_eval)), abs(np.max(x_eval)))
+        plt.xlim(-xmax, xmax)
+    plt.legend(title=f"gamma-mode: {args.gamma_mode}")
+    plot_path = os.path.join(plot_dir, f"TrueComp_{ref_base}_vs_{eval_base}_norm-{args.norm_mode}_zref-{args.z_ref:g}_z-{z_depth_ref:g}-{z_depth_eval:g}.png")
+    plt.savefig(plot_path)
+    print("Plot saved: " + plot_path)
+
+    report_path = os.path.join(report_dir, f"TrueReport_{ref_base}_vs_{eval_base}_norm-{args.norm_mode}_zref-{args.z_ref:g}_z-{z_depth_ref:g}-{z_depth_eval:g}.txt")
+    with open(report_path, 'w', encoding='utf-8') as f:
+        f.write('# True scaling report\n\n')
+        f.write('## Inputs\n')
+        f.write(f"ref PDD: {args.ref_pdd_type} | {args.ref_pdd_file}\n")
+        f.write(f"eval PDD: {args.eval_pdd_type} | {args.eval_pdd_file}\n")
+        f.write(f"ref OCR: {args.ref_ocr_type} | {args.ref_ocr_file}\n")
+        f.write(f"eval OCR: {args.eval_ocr_type} | {args.eval_ocr_file}\n")
+        f.write('\n## Params\n')
+        f.write(f"norm-mode: {args.norm_mode}, z_ref: {args.z_ref} cm\n")
+        f.write(f"gamma-mode: {args.gamma_mode}\n")
+        f.write(f"ref depth (cm): {z_depth_ref:.6f}, eval depth (cm): {z_depth_eval:.6f}\n")
+        if args.eval_z_shift != 0 or args.eval_pdd_z_shift != 0:
+            f.write(f"eval-z-shift: {args.eval_z_shift} cm, eval-pdd-z-shift: {args.eval_pdd_z_shift} cm\n")
+        f.write(f"S_axis(ref): {s_axis_ref:.6f}, S_axis(eval): {s_axis_eval:.6f}\n")
+        f.write(f"grid (cm): {grid_step:.6f}\n")
+        f.write('\n## Results\n')
+        f.write(f"RMSE: {rmse:.6f}\n")
+        f.write(f"Gamma 1 (DD={args.dd1:.1f}%, DTA={args.dta1:.1f}mm, Cutoff={args.cutoff:.1f}%): {g1:.2f}%\n")
+        f.write(f"Gamma 2 (DD={args.dd2:.1f}%, DTA={args.dta2:.1f}mm, Cutoff={args.cutoff:.1f}%): {g2:.2f}%\n")
+        # FWHM summary in report
+        def _fmt(v):
+            try:
+                return ("{:.6f}".format(float(v))) if (v is not None and np.isfinite(float(v))) else "N/A"
+            except Exception:
+                return "N/A"
+        f.write(f"FWHM(ref) (cm): {_fmt(f1)}\n")
+        f.write(f"FWHM(eval) (cm): {_fmt(f2)}\n")
+        f.write(f"FWHM delta (eval-ref) (cm): {_fmt(f_delta)}\n")
+        # Re-run command line (for reproducibility)
+        try:
+            def _q(v: str) -> str:
+                v = str(v)
+                return '"' + v.replace('"', '\\"') + '"' if (' ' in v or '\\' in v) else v
+            argv = [
+                sys.executable,
+                os.path.join(prj_root, 'src', 'ocr_true_scaling.py'),
+                '--ref-pdd-type', args.ref_pdd_type,
+                '--ref-pdd-file', args.ref_pdd_file,
+                '--eval-pdd-type', args.eval_pdd_type,
+                '--eval-pdd-file', args.eval_pdd_file,
+                '--ref-ocr-type', args.ref_ocr_type,
+                '--ref-ocr-file', args.ref_ocr_file,
+                '--eval-ocr-type', args.eval_ocr_type,
+                '--eval-ocr-file', args.eval_ocr_file,
+                '--norm-mode', args.norm_mode,
+                '--z-ref', str(args.z_ref),
+                '--dd1', str(args.dd1), '--dta1', str(args.dta1),
+                '--dd2', str(args.dd2), '--dta2', str(args.dta2),
+                '--gamma-mode', args.gamma_mode,
+                '--cutoff', str(args.cutoff),
+                '--smooth-window', str(args.smooth_window),
+                '--smooth-order', str(args.smooth_order),
+                '--center-tol-cm', str(args.center_tol_cm),
+                '--eval-z-shift', str(args.eval_z_shift),
+                '--eval-pdd-z-shift', str(args.eval_pdd_z_shift),
+            ]
+            if args.center_interp:
+                argv.append('--center-interp')
+            if args.no_smooth:
+                argv.append('--no-smooth')
+            if args.grid is not None:
+                argv.extend(['--grid', str(args.grid)])
+            if args.ymin is not None:
+                argv.extend(['--ymin', str(args.ymin)])
+            if args.ymax is not None:
+                argv.extend(['--ymax', str(args.ymax)])
+            if args.xlim_symmetric:
+                argv.append('--xlim-symmetric')
+            if args.legend_ref:
+                argv.extend(['--legend-ref', args.legend_ref])
+            if args.legend_eval:
+                argv.extend(['--legend-eval', args.legend_eval])
+            if args.fwhm_warn_cm is not None:
+                argv.extend(['--fwhm-warn-cm', str(args.fwhm_warn_cm)])
+            if args.output_dir:
+                argv.extend(['--output-dir', args.output_dir])
+            if args.export_csv:
+                argv.append('--export-csv')
+            if args.export_gamma:
+                argv.append('--export-gamma')
+            cmd_line = ' '.join(_q(a) for a in argv)
+            prefix = '& ' if os.name == 'nt' else ''
+            f.write('\n## Re-run\n')
+            f.write(prefix + cmd_line + '\n')
+        except Exception:
+            pass
+    print("Report saved: " + report_path)
+
+    # Optional JSON report for automation
+    if args.report_json:
+        def _float(v, default=None):
+            try:
+                return None if v is None else float(v)
+            except Exception:
+                return default
+        payload = {
+            'inputs': {
+                'ref_pdd': {'type': args.ref_pdd_type, 'file': args.ref_pdd_file},
+                'eval_pdd': {'type': args.eval_pdd_type, 'file': args.eval_pdd_file},
+                'ref_ocr': {'type': args.ref_ocr_type, 'file': args.ref_ocr_file},
+                'eval_ocr': {'type': args.eval_ocr_type, 'file': args.eval_ocr_file},
+            },
+            'params': {
+                'norm_mode': args.norm_mode,
+                'z_ref_cm': float(args.z_ref),
+                'gamma_mode': args.gamma_mode,
+                'dd1_percent': float(args.dd1),
+                'dta1_mm': float(args.dta1),
+                'dd2_percent': float(args.dd2),
+                'dta2_mm': float(args.dta2),
+                'cutoff_percent': float(args.cutoff),
+                'grid_cm': float(grid_step) if grid_step is not None else None,
+                'center_tol_cm': float(args.center_tol_cm),
+                'center_interp': bool(args.center_interp),
+                'smooth_enabled': (not args.no_smooth),
+                'smooth_window': int(args.smooth_window),
+                'smooth_order': int(args.smooth_order),
+                'fwhm_warn_cm': float(args.fwhm_warn_cm),
+                'eval_z_shift': float(args.eval_z_shift),
+                'eval_pdd_z_shift': float(args.eval_pdd_z_shift),
+            },
+            'derived': {
+                'ref_depth_cm': _float(z_depth_ref),
+                'eval_depth_cm': _float(z_depth_eval),
+                'S_axis_ref': _float(s_axis_ref),
+                'S_axis_eval': _float(s_axis_eval),
+                'fwhm_ref_cm': _float(f1),
+                'fwhm_eval_cm': _float(f2),
+                'fwhm_delta_cm': _float(f_delta),
+            },
+            'results': {
+                'rmse': _float(rmse, 0.0),
+                'gamma1_gpr_percent': _float(g1, 0.0),
+                'gamma2_gpr_percent': _float(g2, 0.0),
+                'plot_path': plot_path,
+                'report_path': report_path,
+            }
+        }
+        try:
+            with open(args.report_json, 'w', encoding='utf-8') as jf:
+                json.dump(payload, jf, ensure_ascii=False, indent=2)
+            print("JSON report saved: " + args.report_json)
+        except Exception as e:
+            print("JSON report write failed: " + str(e), file=sys.stderr)
+
+    # PDD comparison report (always by default; can be disabled by --no-pdd-report)
+    if not args.no_pdd_report:
+        # Resample on common grid for RMSE
+        def resample_1d(x1, y1, x2, y2, step):
+            if not step or step <= 0:
+                return None, None, None
+            xmin = max(np.min(x1), np.min(x2)); xmax = min(np.max(x1), np.max(x2))
+            if xmax - xmin <= step * 2:
+                return None, None, None
+            n = int(np.floor((xmax - xmin) / step)) + 1
+            grid = xmin + np.arange(n + 1) * step
+            return grid, np.interp(grid, x1, y1), np.interp(grid, x2, y2)
+
+        grid_pdd, pdd_ref_g, pdd_eval_g = resample_1d(z_ref_pos, z_ref_norm, z_eval_pos, z_eval_norm, grid_step)
+        if grid_pdd is not None:
+            pdd_rmse = float(np.sqrt(np.mean((pdd_ref_g - pdd_eval_g) ** 2)))
+            zr, yrp = grid_pdd, pdd_ref_g
+            ze, yep = grid_pdd, pdd_eval_g
+        else:
+            pdd_rmse = float(np.sqrt(np.mean((np.interp(z_ref_pos, z_eval_pos, z_eval_norm) - z_ref_norm) ** 2)))
+            zr, yrp = z_ref_pos, z_ref_norm
+            ze, yep = z_eval_pos, z_eval_norm
+
+        pdd_g1 = compute_gamma(zr, yrp, ze, yep, args.dd1, args.dta1, args.cutoff, args.gamma_mode)
+        pdd_g2 = compute_gamma(zr, yrp, ze, yep, args.dd2, args.dta2, args.cutoff, args.gamma_mode)
+
+        ref_pdd_base = os.path.splitext(os.path.basename(args.ref_pdd_file))[0]
+        eval_pdd_base = os.path.splitext(os.path.basename(args.eval_pdd_file))[0]
+        pdd_report_path = os.path.join(report_dir, f"PDDReport_{ref_pdd_base}_vs_{eval_pdd_base}_norm-{args.norm_mode}_zref-{args.z_ref:g}.txt")
+        with open(pdd_report_path, 'w', encoding='utf-8') as f2:
+            f2.write('# PDD comparison report\n\n')
+            f2.write('## Inputs\n')
+            f2.write(f"ref PDD: {args.ref_pdd_type} | {args.ref_pdd_file}\n")
+            f2.write(f"eval PDD: {args.eval_pdd_type} | {args.eval_pdd_file}\n")
+            f2.write('\n## Params\n')
+            f2.write(f"norm-mode: {args.norm_mode}, z_ref: {args.z_ref} cm\n")
+            f2.write(f"gamma-mode: {args.gamma_mode}\n")
+            f2.write(f"grid (cm): {grid_step:.6f}\n")
+            f2.write('\n## Results\n')
+            f2.write(f"RMSE: {pdd_rmse:.6f}\n")
+            f2.write(f"Gamma 1 (DD={args.dd1:.1f}%, DTA={args.dta1:.1f}mm, Cutoff={args.cutoff:.1f}%): {pdd_g1:.2f}%\n")
+            f2.write(f"Gamma 2 (DD={args.dd2:.1f}%, DTA={args.dta2:.1f}mm, Cutoff={args.cutoff:.1f}%): {pdd_g2:.2f}%\n")
+            # Re-run command line (same as TrueReport)
+            try:
+                def _q(v: str) -> str:
+                    v = str(v)
+                    return '"' + v.replace('"', '\\"') + '"' if (' ' in v or '\\' in v) else v
+                argv = [
+                    sys.executable,
+                    os.path.join(prj_root, 'src', 'ocr_true_scaling.py'),
+                    '--ref-pdd-type', args.ref_pdd_type,
+                    '--ref-pdd-file', args.ref_pdd_file,
+                    '--eval-pdd-type', args.eval_pdd_type,
+                    '--eval-pdd-file', args.eval_pdd_file,
+                    '--ref-ocr-type', args.ref_ocr_type,
+                    '--ref-ocr-file', args.ref_ocr_file,
+                    '--eval-ocr-type', args.eval_ocr_type,
+                    '--eval-ocr-file', args.eval_ocr_file,
+                    '--norm-mode', args.norm_mode,
+                    '--z-ref', str(args.z_ref),
+                    '--dd1', str(args.dd1), '--dta1', str(args.dta1),
+                    '--dd2', str(args.dd2), '--dta2', str(args.dta2),
+                    '--gamma-mode', args.gamma_mode,
+                    '--cutoff', str(args.cutoff),
+                    '--smooth-window', str(args.smooth_window),
+                    '--smooth-order', str(args.smooth_order),
+                    '--center-tol-cm', str(args.center_tol_cm),
+                    '--eval-z-shift', str(args.eval_z_shift),
+                    '--eval-pdd-z-shift', str(args.eval_pdd_z_shift),
+                ]
+                if args.center_interp:
+                    argv.append('--center-interp')
+                if args.no_smooth:
+                    argv.append('--no-smooth')
+                if args.grid is not None:
+                    argv.extend(['--grid', str(args.grid)])
+                if args.ymin is not None:
+                    argv.extend(['--ymin', str(args.ymin)])
+                if args.ymax is not None:
+                    argv.extend(['--ymax', str(args.ymax)])
+                if args.xlim_symmetric:
+                    argv.append('--xlim-symmetric')
+                if args.legend_ref:
+                    argv.extend(['--legend-ref', args.legend_ref])
+                if args.legend_eval:
+                    argv.extend(['--legend-eval', args.legend_eval])
+                if args.fwhm_warn_cm is not None:
+                    argv.extend(['--fwhm-warn-cm', str(args.fwhm_warn_cm)])
+                if args.output_dir:
+                    argv.extend(['--output-dir', args.output_dir])
+                if args.export_csv:
+                    argv.append('--export-csv')
+                if args.export_gamma:
+                    argv.append('--export-gamma')
+                cmd_line = ' '.join(_q(a) for a in argv)
+                prefix = '& ' if os.name == 'nt' else ''
+                f2.write('\n## Re-run\n')
+                f2.write(prefix + cmd_line + '\n')
+            except Exception:
+                pass
+        print("PDD Report saved: " + pdd_report_path)
+
+        # PDD plot
+        try:
+            plt.figure(figsize=(10, 6))
+            plt.plot(z_ref_pos, z_ref_norm, label=(args.legend_ref or 'Reference') + ' PDD')
+            plt.plot(z_eval_pos, z_eval_norm, label=(args.legend_eval or 'Evaluation') + ' PDD')
+            plt.title(
+                "PDD comparison [gamma: {}]\n".format(args.gamma_mode)
+                + "norm={}, z_ref={} cm".format(args.norm_mode, args.z_ref)
+            )
+            plt.xlabel('z (cm)')
+            plt.ylabel('PDD (norm)')
+            plt.grid(True, alpha=0.3)
+            plt.legend(title=f"gamma-mode: {args.gamma_mode}")
+            pdd_plot_path = os.path.join(plot_dir, f"PDDComp_{ref_pdd_base}_vs_{eval_pdd_base}_norm-{args.norm_mode}_zref-{args.z_ref:g}.png")
+            plt.savefig(pdd_plot_path)
+            print("PDD Plot saved: " + pdd_plot_path)
+        except Exception:
+            pass
+
+    # CSV exports
+    if args.export_csv:
+        pd.DataFrame({'x_cm': x_ref, 'true_dose': y_true_ref}).to_csv(
+            os.path.join(data_dir, f"TrueRef_{ref_base}_z{z_depth_ref:g}.csv"), index=False, encoding='utf-8'
+        )
+        pd.DataFrame({'x_cm': x_eval, 'true_dose': y_true_eval}).to_csv(
+            os.path.join(data_dir, f"TrueEval_{eval_base}_z{z_depth_eval:g}.csv"), index=False, encoding='utf-8'
+        )
+        if grid is not None:
+            pd.DataFrame({'x_cm': xr, 'true_dose': yr}).to_csv(
+                os.path.join(data_dir, f"TrueRefResampled_{ref_base}_z{z_depth_ref:g}_grid{grid_step:g}.csv"), index=False, encoding='utf-8'
+            )
+            pd.DataFrame({'x_cm': xe, 'true_dose': ye}).to_csv(
+                os.path.join(data_dir, f"TrueEvalResampled_{eval_base}_z{z_depth_eval:g}_grid{grid_step:g}.csv"), index=False, encoding='utf-8'
+            )
+        if args.export_gamma:
+            g = pymedphys.gamma(
+                axes_reference=(xr * 10.0,), dose_reference=yr,
+                axes_evaluation=(xe * 10.0,), dose_evaluation=np.interp(xr, xe, ye),
+                dose_percent_threshold=args.dd1,
+                distance_mm_threshold=args.dta1,
+                lower_percent_dose_cutoff=args.cutoff,
+                local_gamma=(args.gamma_mode == 'local'),
+                global_normalisation=float(np.max(yr)) if np.max(yr) > 0 else 1.0,
+            )
+            pd.DataFrame({'x_cm': xr, 'true_ref': yr, 'true_eval_interp': np.interp(xr, xe, ye), 'gamma': g}).to_csv(
+                os.path.join(data_dir, f"Gamma_{ref_base}_vs_{eval_base}_z{z_depth_ref:g}-{z_depth_eval:g}.csv"), index=False, encoding='utf-8'
+            )
+
+
+if __name__ == '__main__':
+    main()

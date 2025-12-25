@@ -6,7 +6,7 @@
 
 - [x] Normalization
   - [x] PDD: dmax=1.00 (default), option z_ref=10 cm.
-  - [x] OCR: center x=0 → 1.00; if absent, nearest within ±0.05 cm, else use max.
+  - [x] OCR: center x=0 => 1.00; if absent, nearest within +/-0.05 cm, else use max.
 
 - [x] True scaling
   - [x] Compute S_axis(z) = PDD_norm(z) via interpolation at OCR depths.
@@ -14,7 +14,7 @@
 
 - [x] Comparison
   - [x] RMSE on true-scaled profiles; optional resample to common grid (config `[Processing].resample_grid_cm`).
-  - [x] γ on true-scaled profiles with primary 2%/2mm/10% and secondary 3%/3mm/10%.
+  - [x] Gamma on true-scaled profiles with primary 2%/2mm/10% and secondary 3%/3mm/10%.
 
 - [x] Outputs
   - [x] Plots and reports clearly labeled as PDD-weighted true scaling with parameters (norm-mode, z_ref, criteria).

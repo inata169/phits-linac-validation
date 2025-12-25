@@ -5,7 +5,7 @@ The tool MUST accept reference and eval from CSV or PHITS .out for both PDD and 
 #### Scenario: Mixed source comparison
 Given reference PDD+OCR from CSV and eval PDD+OCR from PHITS
 When true scaling is enabled
-Then the tool constructs True(x,z) for both sides and compares γ and RMSE
+Then the tool constructs True(x,z) for both sides and compares gamma and RMSE
 
 ### Requirement: R2: Units and normalization
 Positions MUST be treated as cm at I/O boundaries. Dose values MUST be normalized to [0,1] prior to true scaling.
@@ -36,10 +36,10 @@ When constructing True(x,10)
 Then True(x,10) = 0.78 * OCR_rel(x,10) for all x
 
 ### Requirement: R6: Metrics on true-scaled profiles
-RMSE MUST be computed on true-scaled profiles at matched depths. γ MUST be computed on true-scaled profiles with primary 2%/2mm/10% and secondary 3%/3mm/10% criteria reported.
+RMSE MUST be computed on true-scaled profiles at matched depths. Gamma MUST be computed on true-scaled profiles with primary 2%/2mm/10% and secondary 3%/3mm/10% criteria reported.
 #### Scenario: Dual gamma reporting
 Given true-scaled reference/eval OCR at depth z
-When computing γ
+When computing gamma
 Then pass rates for 2%/2mm/10% and 3%/3mm/10% are both reported
 
 ### Requirement: R7: Optional resampling for RMSE/plots
@@ -48,3 +48,4 @@ If configured via resample_grid_cm, the tool MUST resample both series to a comm
 Given resample_grid_cm=0.1
 When computing RMSE
 Then both profiles are interpolated to a 0.1 cm common grid over their overlapping x-range before RMSE
+

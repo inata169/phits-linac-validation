@@ -28,3 +28,4 @@ Add end-to-end PDD-weighted “true” scaling for OCR comparison as defined in 
 - Builds True(x,z) as per spec for both reference and eval.
 - Reports γ(2%/2mm,10%) and γ(3%/3mm,10%) pass rates and RMSE on true-scaled profiles.
 - Handles mixed input sources (CSV/PHITS) symmetrically.
+

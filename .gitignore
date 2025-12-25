@@ -29,6 +29,7 @@ notebooks/.ipynb_checkpoints/
 # Common folders created by code editors like VS Code or PyCharm
 .vscode/
 .idea/
+.claude/
 
 # OS-specific files
 # Files automatically created by macOS or Windows

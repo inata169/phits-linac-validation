@@ -9,7 +9,7 @@
 #### Scenario: Mixed source comparison
 - Given reference PDD+OCR from CSV and eval PDD+OCR from PHITS
 - When true scaling is enabled
-- Then the tool constructs True(x,z) for both sides and compares γ and RMSE.
+- Then the tool constructs True(x,z) for both sides and compares gamma and RMSE.
 
 ## ADDED Requirements
 
@@ -19,7 +19,7 @@
 #### Scenario: Mixed source comparison
 - Given reference PDD+OCR from CSV and eval PDD+OCR from PHITS
 - When true scaling is enabled
-- Then the tool constructs True(x,z) for both sides and compares γ and RMSE.
+- Then the tool constructs True(x,z) for both sides and compares gamma and RMSE.
 
 #### Requirement: Units and normalization
 - Positions MUST be treated as cm at I/O boundaries.
@@ -59,11 +59,11 @@
 
 #### Requirement: Metrics on true-scaled profiles
 - RMSE MUST be computed on true-scaled profiles at matched depths.
-- γ MUST be computed on true-scaled profiles with primary 2%/2mm/10% and secondary 3%/3mm/10% criteria reported.
+- Gamma MUST be computed on true-scaled profiles with primary 2%/2mm/10% and secondary 3%/3mm/10% criteria reported.
 
 #### Scenario: Dual gamma reporting
 - Given true-scaled reference/eval OCR at depth z
-- When computing γ
+- When computing gamma
 - Then pass rates for 2%/2mm/10% and 3%/3mm/10% are both reported.
 
 #### Requirement: Optional resampling for RMSE/plots
@@ -73,3 +73,4 @@
 - Given `resample_grid_cm=0.1`
 - When computing RMSE
 - Then both profiles are interpolated to a 0.1 cm common grid over their overlapping x-range before RMSE.
+
