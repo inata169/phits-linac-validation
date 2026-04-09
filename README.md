@@ -1,4 +1,15 @@
-﻿# PHITS 医療用リニアック線量評価ツール
+# ⚠️ 移転・統合のお知らせ (Migration Notice)
+
+このプロジェクトは、より広範な DICOM-PHITS 連携ワークフローを管理するために **[dicom-phits_inp](https://github.com/inata169/dicom-phits_inp)** リポジトリへ統合されました。
+
+**今後の開発・バグ修正・ドキュメント更新は、統合先リポジトリ内の [phits-linac-validation-main](https://github.com/inata169/dicom-phits_inp/tree/main/phits-linac-validation-main) ディレクトリで継続されます。**
+
+本リポジトリは歴史的な参照のために残されますが、**アーカイブ（Read-only）** 状態となります。最新版をご利用の方は上記リンク先を参照してください。
+
+---
+
+# PHITS 医療用リニアック線量評価ツール
+
 
 [![release](https://img.shields.io/github/v/release/inata169/phits-linac-validation?include_prereleases&label=release)](https://github.com/inata169/phits-linac-validation/releases/latest)
 ![python](https://img.shields.io/badge/python-%3E%3D3.9-blue)
